@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Aura — Apna AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #0a0a18;
+    --bg-1: #12112a;
+    --bg-2: #191833;
+    --violet: #7c5cfc;
+    --violet-soft: rgba(124, 92, 252, 0.18);
+    --cyan: #22d3ee;
+    --gold: #f5b942;
+    --text-hi: #f2f0ff;
+    --text-lo: #9891c4;
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,92,252,0.35), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(34,211,238,0.12), transparent),
+      var(--bg-0);
+    color: var(--text-hi);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ---------- Header ---------- */
+  #header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    z-index: 10;
+  }
+
+  #orb {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: conic-gradient(from 180deg, var(--violet), var(--cyan), var(--violet));
+    position: relative;
+    flex-shrink: 0;
+    animation: spin 8s linear infinite;
+    box-shadow: 0 0 24px rgba(124,92,252,0.5);
+  }
+  #orb::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: var(--bg-0);
+  }
+  #orb::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff, var(--violet));
+    z-index: 1;
+    animation: pulse-core 2.4s ease-in-out infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse-core { 0%,100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.15); } }
+
+  #headerText { display: flex; flex-direction: column; gap: 2px; }
+  #botName {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.2px;
+  }
+  #botStatus {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-lo);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #botStatus .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+  }
+  #premiumBadge {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(245,185,66,0.4);
+    padding: 4px 9px;
+    border-radius: 20px;
+    background: rgba(245,185,66,0.08);
+  }
+
+  /* ---------- Chat ---------- */
+  #chatBox {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
+  }
+  #chatBox::-webkit-scrollbar { width: 4px; }
+  #chatBox::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+
+  .row { display: flex; max-width: 100%; animation: rise 0.35s ease; }
+  .row.user { justify-content: flex-end; }
+  .row.bot { justify-content: flex-start; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .msg {
+    max-width: 78%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .row.user .msg {
+    background: linear-gradient(135deg, var(--violet), #5f3fe0);
+    color: #fff;
+    border-bottom-right-radius: 5px;
+    box-shadow: 0 4px 16px rgba(124,92,252,0.25);
+  }
+  .row.bot .msg {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    color: var(--text-hi);
+    border-bottom-left-radius: 5px;
+  }
+
+  .typing { display: flex; gap: 4px; padding: 4px 2px; }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-lo);
+    animation: blink 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100% { opacity: 0.25; } 40% { opacity: 1; } }
+
+  /* ---------- Input bar ---------- */
+  #inputWrap {
+    padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+  }
+  #status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    text-align: center;
+    min-height: 16px;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+  #inputBar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 26px;
+    padding: 6px 6px 6px 18px;
+  }
+  #textInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-hi);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+  }
+  #textInput::placeholder { color: var(--text-lo); }
+
+  button.round {
+    border: none;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  button.round:active { transform: scale(0.92); }
+
+  #sendBtn {
+    background: linear-gradient(135deg, var(--violet), #5f3fe0);
+    box-shadow: 0 4px 14px rgba(124,92,252,0.4);
+  }
+  #sendBtn svg { width: 18px; height: 18px; }
+
+  #micBtn {
+    background: var(--bg-2);
+    border: 1px solid var(--glass-border);
+    position: relative;
+  }
+  #micBtn svg { width: 18px; height: 18px; stroke: var(--text-hi); z-index: 2; }
+  #micBtn.recording {
+    background: linear-gradient(135deg, #ff4e6b, #c81e4a);
+    box-shadow: 0 0 0 6px rgba(255,78,107,0.15), 0 4px 18px rgba(255,78,107,0.4);
+  }
+
+  /* Waveform signature element - shows while recording */
+  #waveform {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 44px;
+    flex: 1;
+  }
+  #waveform.active { display: flex; }
+  #waveform span {
+    width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--cyan), var(--violet));
+    animation: wave 0.9s ease-in-out infinite;
+  }
+  #waveform span:nth-child(1) { height: 10px; animation-delay: 0s; }
+  #waveform span:nth-child(2) { height: 22px; animation-delay: 0.1s; }
+  #waveform span:nth-child(3) { height: 14px; animation-delay: 0.2s; }
+  #waveform span:nth-child(4) { height: 28px; animation-delay: 0.3s; }
+  #waveform span:nth-child(5) { height: 16px; animation-delay: 0.4s; }
+  #waveform span:nth-child(6) { height: 24px; animation-delay: 0.5s; }
+  #waveform span:nth-child(7) { height: 12px; animation-delay: 0.6s; }
+  @keyframes wave {
+    0%, 100% { transform: scaleY(0.4); opacity: 0.6; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #orb, #orb::before, .row, .typing span, #waveform span { animation: none !important; }
+  }
+
+  /* ---------- Schedule button ---------- */
+  #scheduleBtn {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 17px;
+    cursor: pointer;
+    color: var(--text-hi);
+    flex-shrink: 0;
+  }
+  #scheduleBtn.hasToday {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(245,185,66,0.12);
+  }
+
+  /* ---------- Schedule panel (slide-up overlay) ---------- */
+  #scheduleOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,5,15,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 40;
+    display: none;
+  }
+  #scheduleOverlay.open { display: block; }
+
+  #schedulePanel {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    max-height: 82vh;
+    background: linear-gradient(180deg, var(--bg-1), var(--bg-0));
+    border-top: 1px solid var(--glass-border);
+    border-radius: 22px 22px 0 0;
+    z-index: 41;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+    display: flex;
+    flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  #scheduleOverlay.open #schedulePanel { transform: translateY(0); }
+
+  #panelHandle {
+    width: 40px; height: 4px;
+    background: var(--glass-border);
+    border-radius: 4px;
+    margin: 10px auto 4px;
+  }
+  #panelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px 14px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  #panelHeader h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+  }
+  #closePanel {
+    background: var(--glass);
+    border: none;
+    color: var(--text-hi);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  #panelBody { overflow-y: auto; padding: 16px 20px 20px; }
+
+  .formRow { display: flex; gap: 8px; margin-bottom: 10px; }
+  .formRow input, .formRow select {
+    flex: 1;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--text-hi);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+  }
+  .formRow input::placeholder { color: var(--text-lo); }
+  .formRow select option { background: var(--bg-1); color: var(--text-hi); }
+
+  #addScheduleBtn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--violet), #5f3fe0);
+    color: #fff;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 18px;
+  }
+
+  #scheduleList { display: flex; flex-direction: column; gap: 8px; }
+  .schedItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 12px 14px;
+  }
+  .schedItem.today { border-color: var(--gold); background: rgba(245,185,66,0.06); }
+  .schedTime {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--cyan);
+    min-width: 54px;
+  }
+  .schedInfo { flex: 1; }
+  .schedSubject { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; }
+  .schedDay { font-size: 11px; color: var(--text-lo); margin-top: 2px; }
+  .schedDelete {
+    background: transparent;
+    border: none;
+    color: var(--text-lo);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  #emptySchedule {
+    text-align: center;
+    color: var(--text-lo);
+    font-size: 13px;
+    padding: 24px 0;
+  }
+</style>
+<link rel="manifest" href="aura-manifest.json">
+<meta name="theme-color" content="#7c5cfc">
+</head>
+<body>
+
+<div id="header">
+  <div id="orb"></div>
+  <div id="headerText">
+    <div id="botName">Aura</div>
+    <div id="botStatus"><span class="dot"></span>online · aapka AI</div>
+  </div>
+  <button id="brainBtn" title="Local AI (offline, free)">🧠</button>
+  <button id="scheduleBtn" title="Study Planner">📅</button>
+  <button id="settingsBtn" title="Settings" onclick="openAuraSettings()">⚙️</button>
+  <div id="premiumBadge">Premium</div>
+</div>
+
+<div id="auraSettingsOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,10,24,0.85);z-index:9999;">
+  <div style="max-width:420px;margin:60px auto;background:var(--bg-1,#12112a);border-radius:16px;padding:20px;max-height:80vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 style="margin:0;color:#f2f0ff;">⚙️ Settings</h2>
+      <button onclick="closeAuraSettings()" style="background:none;border:none;color:#f2f0ff;font-size:22px;cursor:pointer;">✕</button>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-weight:600;color:#f2f0ff;margin-bottom:8px;">💬 Chat History</div>
+      <div id="auraHistoryList" style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;"></div>
+      <div style="font-size:12px;color:#9891c4;margin-top:8px;" id="auraHistoryEmpty">Koi purani chat nahi hai abhi.</div>
+    </div>
+
+    <button onclick="startNewAuraChat()" style="width:100%;padding:10px;border-radius:10px;border:none;background:#7c5cfc;color:white;font-weight:600;margin-bottom:10px;cursor:pointer;">➕ Nayi Chat Shuru Karo</button>
+    <button onclick="clearAllAuraHistory()" style="width:100%;padding:10px;border-radius:10px;border:1px solid #f5b942;background:none;color:#f5b942;font-weight:600;cursor:pointer;">🗑️ Sari History Delete Karo</button>
+  </div>
+</div>
+
+
+<div id="scheduleOverlay">
+  <div id="schedulePanel">
+    <div id="panelHandle"></div>
+    <div id="panelHeader">
+      <h2>📚 Study Planner</h2>
+      <button id="closePanel">✕</button>
+    </div>
+    <div id="panelBody">
+      <div class="formRow">
+        <input type="text" id="subjectInput" placeholder="Subject (jaise: Maths)">
+      </div>
+      <div class="formRow">
+        <select id="dayInput">
+          <option value="Monday">Somvaar</option>
+          <option value="Tuesday">Mangalvaar</option>
+          <option value="Wednesday">Budhvaar</option>
+          <option value="Thursday">Guruvaar</option>
+          <option value="Friday">Shukravaar</option>
+          <option value="Saturday">Shanivaar</option>
+          <option value="Sunday">Ravivaar</option>
+        </select>
+        <input type="time" id="timeInput">
+      </div>
+      <button id="addScheduleBtn">+ Schedule Add Karo</button>
+      <div id="scheduleList"></div>
+      <div id="emptySchedule">Abhi koi schedule nahi hai. Upar se add karo.</div>
+    </div>
+  </div>
+</div>
+
+<div id="chatBox"></div>
+
+<div id="inputWrap">
+  <div id="status"></div>
+  <div id="inputBar">
+    <input type="text" id="textInput" placeholder="Message likho...">
+    <div id="waveform">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <button class="round" id="micBtn" title="Bol kar bhejo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+    </button>
+    <button class="round" id="sendBtn" title="Bhejo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2" fill="white" stroke="none"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ------------------------------------------------------------------
+// Backend Config — jab backend deploy ho jaye, sirf yahan URL daal do
+// (jaise "https://aura-backend.onrender.com"). Khaali "" rakhoge to
+// sirf offline/local AI hi kaam karega.
+// ------------------------------------------------------------------
+const GEMINI_API_KEY = 'GEMINI_API_KEY_HERE'; // Yahan apni naye Gemini key daalo
+
+// ------------------------------------------------------------------
+// Knowledge base - yahan apne sawal/jawab add kar sakte ho
+// ------------------------------------------------------------------
+const knowledge = [
+  { patterns: ["hello", "hi", "namaste", "hey"], responses: ["Namaste! Main Aura hoon. Aaj kis cheez mein madad karoon?", "Hi! Kaise ho? Bataiye kya jaanna hai.", "Namaste! Batao, kya chal raha hai?"] },
+  { patterns: ["naam kya hai", "kaun ho tum"], responses: ["Main Aura hoon — aapka khud ka bana hua AI assistant. Aapki padhai aur sawalon dono mein madad kar sakta hoon."] },
+  { patterns: ["kaise ho", "haal"], responses: ["Main theek hoon, shukriya poochne ke liye! Aap batao, sab badhiya?", "Sab accha chal raha hai mere taraf se. Aapka din kaisa ja raha hai?"] },
+  { patterns: ["kya kar sakte ho"], responses: ["Kaafi kuch — aapki baat sun sakta hoon (bolke bhi), general sawalon ke jawab de sakta hoon, aur padhai ka schedule bhi manage kar sakta hoon.", "Main sawalon ke jawab deta hoon, jo mujhe nahi pata wo Wikipedia pe dhoondh leta hoon, aur aapka study schedule bhi rakh sakta hoon."] },
+  { patterns: ["shukriya", "dhanyavad", "thank you"], responses: ["Koi baat nahi, khushi hui!", "Bilkul, jab bhi zaroorat ho bata dena."] },
+  { patterns: ["bye", "alvida"], responses: ["Alvida! Phir milte hain.", "Theek hai, take care! Phir baat karenge."] },
+  { patterns: ["tum ai ho", "tum real ho", "tum sach mein baat karte ho"], responses: ["Haan, main ek AI hoon — Claude jitna advanced to nahi, lekin main poori koshish karta hoon achha jawab dene ki."] }
+];
+
+function findResponse(userText) {
+  const lower = userText.toLowerCase();
+  let bestScore = 0, bestEntry = null;
+  knowledge.forEach(entry => {
+    entry.patterns.forEach(p => {
+      const words = p.toLowerCase().split(" ");
+      let score = 0;
+      words.forEach(w => { if (lower.includes(w)) score++; });
+      if (score > bestScore) { bestScore = score; bestEntry = entry; }
+    });
+  });
+  if (bestEntry && bestScore > 0) {
+    return bestEntry.responses[Math.floor(Math.random() * bestEntry.responses.length)];
+  }
+  return null; // local knowledge mein nahi mila -> Wikipedia search hoga
+}
+
+// ------------------------------------------------------------------
+// Chat UI logic
+// ------------------------------------------------------------------
+const chatBox = document.getElementById("chatBox");
+const textInput = document.getElementById("textInput");
+const sendBtn = document.getElementById("sendBtn");
+const micBtn = document.getElementById("micBtn");
+const waveform = document.getElementById("waveform");
+const statusEl = document.getElementById("status");
+
+function addMessage(text, sender) {
+  const row = document.createElement("div");
+  row.className = "row " + sender;
+  const bubble = document.createElement("div");
+  bubble.className = "msg";
+  bubble.textContent = text;
+  row.appendChild(bubble);
+  chatBox.appendChild(row);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  saveCurrentAuraMessage(text, sender);
+  return row;
+}
+
+// ===== Settings + Chat History =====
+function getAuraHistorySessions(){
+  try{ return JSON.parse(localStorage.getItem("auraChatSessions") || "[]"); }catch(e){ return []; }
+}
+function saveAuraHistorySessions(sessions){
+  localStorage.setItem("auraChatSessions", JSON.stringify(sessions));
+}
+function getCurrentAuraSessionId(){
+  let id = localStorage.getItem("auraCurrentSessionId");
+  if(!id){
+    id = "s_" + Date.now();
+    localStorage.setItem("auraCurrentSessionId", id);
+  }
+  return id;
+}
+function saveCurrentAuraMessage(text, sender){
+  const sessions = getAuraHistorySessions();
+  const id = getCurrentAuraSessionId();
+  let session = sessions.find(s => s.id === id);
+  if(!session){
+    session = { id, title: text.slice(0,40), startedAt: Date.now(), messages: [] };
+    sessions.unshift(session);
+  }
+  session.messages.push({ text, sender, at: Date.now() });
+  saveAuraHistorySessions(sessions);
+}
+function openAuraSettings(){
+  renderAuraHistoryList();
+  document.getElementById("auraSettingsOverlay").style.display = "block";
+}
+function closeAuraSettings(){
+  document.getElementById("auraSettingsOverlay").style.display = "none";
+}
+function renderAuraHistoryList(){
+  const list = document.getElementById("auraHistoryList");
+  const empty = document.getElementById("auraHistoryEmpty");
+  const sessions = getAuraHistorySessions();
+  list.innerHTML = "";
+  if(sessions.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  sessions.forEach(s => {
+    const item = document.createElement("div");
+    item.style.cssText = "padding:10px;background:rgba(124,92,252,0.12);border-radius:10px;cursor:pointer;color:#f2f0ff;font-size:13px;";
+    const d = new Date(s.startedAt);
+    item.textContent = (s.title || "Chat") + " — " + d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    item.onclick = () => loadAuraSession(s.id);
+    list.appendChild(item);
+  });
+}
+function loadAuraSession(id){
+  const sessions = getAuraHistorySessions();
+  const session = sessions.find(s => s.id === id);
+  if(!session) return;
+  localStorage.setItem("auraCurrentSessionId", id);
+  chatBox.innerHTML = "";
+  session.messages.forEach(m => {
+    const row = document.createElement("div");
+    row.className = "row " + m.sender;
+    const bubble = document.createElement("div");
+    bubble.className = "msg";
+    bubble.textContent = m.text;
+    row.appendChild(bubble);
+    chatBox.appendChild(row);
+  });
+  chatBox.scrollTop = chatBox.scrollHeight;
+  closeAuraSettings();
+}
+function startNewAuraChat(){
+  localStorage.removeItem("auraCurrentSessionId");
+  chatBox.innerHTML = "";
+  closeAuraSettings();
+  addMessage("Namaste! Main Aura hoon, aapka AI. Kya madad karu?", "bot");
+}
+function clearAllAuraHistory(){
+  if(!confirm("Sari chat history delete ho jayegi. Pakka?")) return;
+  localStorage.removeItem("auraChatSessions");
+  localStorage.removeItem("auraCurrentSessionId");
+  renderAuraHistoryList();
+  chatBox.innerHTML = "";
+}
+
+
+function showTyping() {
+  const row = document.createElement("div");
+  row.className = "row bot";
+  row.id = "typingRow";
+  row.innerHTML = '<div class="msg typing"><span></span><span></span><span></span></div>';
+  chatBox.appendChild(row);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById("typingRow");
+  if (el) el.remove();
+}
+
+// ------------------------------------------------------------------
+// Wikipedia lookup - jab local knowledge mein jawab na mile,
+// to bot khud Wikipedia (Hindi, phir English) pe search karega
+// ------------------------------------------------------------------
+function cleanQueryForSearch(text) {
+  // sawal ke fazool shabd hata kar sirf important keywords rakhte hain
+  return text
+    .replace(/\b(kya|kaun|kahan|kab|kyun|kaise|hai|ho|the|batao|bata|do|please|ka|ki|ke)\b/gi, "")
+    .trim();
+}
+
+async function fetchWikipediaAnswer(query) {
+  const cleanQuery = cleanQueryForSearch(query) || query;
+  const domains = ["hi.wikipedia.org", "en.wikipedia.org"];
+
+  for (const domain of domains) {
+    try {
+      const url = `https://${domain}/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(cleanQuery)}&gsrlimit=1&prop=extracts&exintro=1&explaintext=1&exsentences=3&format=json&origin=*`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.query && data.query.pages) {
+        const pages = Object.values(data.query.pages);
+        const page = pages[0];
+        if (page && page.extract && page.extract.trim().length > 0) {
+          return { title: page.title, extract: page.extract.trim(), source: domain };
+        }
+      }
+    } catch (err) {
+      // is domain pe fail hua, agla try karega
+    }
+  }
+  return null;
+}
+
+async function handleUserMessage(text) {
+  if (!text.trim()) return;
+  addMessage(text, "user");
+  textInput.value = "";
+
+  const scheduleReply = tryHandleScheduleCommand(text);
+  if (scheduleReply !== null) {
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      addMessage(scheduleReply, "bot");
+    }, 300);
+    return;
+  }
+
+  // Agar internet hai aur Gemini key set hai, to pehle seedha Gemini se try karo
+  if (GEMINI_API_KEY !== 'GEMINI_API_KEY_HERE' && navigator.onLine) {
+    showTyping();
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text }] }],
+          systemInstruction: { parts: [{ text: "Tum Aura ho, ek friendly AI assistant jo Hinglish (Hindi+English mix) mein natural, chhote aur seedhe jawab deta hai." }] }
+        })
+      });
+      const data = await res.json();
+      hideTyping();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (reply) {
+        addMessage(reply.trim(), "bot");
+        return;
+      }
+    } catch (err) {
+      hideTyping();
+      // internet hoke bhi Gemini fail ho gaya -> neeche offline fallback pe chala jayega
+    }
+  }
+
+  // Agar local offline AI (WebLLM) load ho chuka hai, usi se jawab lo
+  if (localAIReady) {
+    showTyping();
+    try {
+      const completion = await localEngine.chat.completions.create({
+        messages: [
+          { role: "system", content: "Tum Aura ho, ek friendly AI assistant jo Hinglish (Hindi+English mix) mein natural, chhote aur seedhe jawab deta hai." },
+          { role: "user", content: text }
+        ]
+      });
+      hideTyping();
+      const reply = completion.choices?.[0]?.message?.content;
+      if (reply) {
+        addMessage(reply.trim(), "bot");
+        return;
+      }
+    } catch (err) {
+      hideTyping();
+      // local AI fail ho gaya -> neeche wale fallback pe chala jayega
+    }
+  }
+
+  const localReply = findResponse(text);
+
+  if (localReply !== null) {
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      addMessage(localReply, "bot");
+    }, 400 + Math.random() * 300);
+    return;
+  }
+
+  // Local knowledge mein nahi mila - Wikipedia pe dhundo
+  showTyping();
+  statusEl.textContent = "🔍 Wikipedia par dhund raha hoon...";
+
+  const result = await fetchWikipediaAnswer(text);
+  hideTyping();
+  statusEl.textContent = "";
+
+  if (result) {
+    const openers = ["Achha sawal! ", "Dekhta hoon... ", "", "Ye raha jawab — "];
+    const opener = openers[Math.floor(Math.random() * openers.length)];
+    addMessage(`${opener}${result.extract}\n\n— स्रोत: Wikipedia (${result.title})`, "bot");
+  } else {
+    addMessage("Hmm, maine Wikipedia pe bhi dhunda lekin kuch sahi nahi mila. Thoda alag tarike se pooch kar dekhoge? Main poori koshish karunga.", "bot");
+  }
+}
+
+sendBtn.addEventListener("click", () => handleUserMessage(textInput.value));
+textInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") handleUserMessage(textInput.value);
+});
+
+// ------------------------------------------------------------------
+// Voice recording -> speech to text (browser ka built-in feature)
+// Bug fix: pehle kabhi-kabhi ek hi voice message do baar bhej jata
+// tha (onresult double-fire ya double-click se). Ab dono se bachaya
+// gaya hai - ek session mein sirf ek hi message bhejega.
+// ------------------------------------------------------------------
+let recognition = null;
+let isRecording = false;
+let resultAlreadyHandled = false;
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognitionAPI) {
+  recognition = new SpeechRecognitionAPI();
+  recognition.lang = "hi-IN";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.continuous = false; // ek baar bolne ke baad khud ruk jaye
+
+  recognition.onstart = () => {
+    isRecording = true;
+    resultAlreadyHandled = false;
+    micBtn.classList.add("recording");
+    waveform.classList.add("active");
+    textInput.style.display = "none";
+    statusEl.textContent = "● Sun raha hoon...";
+  };
+
+  recognition.onresult = (event) => {
+    if (resultAlreadyHandled) return; // double-fire se bachne ke liye
+    resultAlreadyHandled = true;
+    const spokenText = event.results[0][0].transcript;
+    statusEl.textContent = "Suna: " + spokenText;
+    handleUserMessage(spokenText);
+    recognition.stop();
+  };
+
+  recognition.onerror = (event) => {
+    statusEl.textContent = "Error: " + event.error + " — mic permission check karo";
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    micBtn.classList.remove("recording");
+    waveform.classList.remove("active");
+    textInput.style.display = "block";
+    setTimeout(() => {
+      if (!statusEl.textContent.startsWith("🔍")) statusEl.textContent = "";
+    }, 2000);
+  };
+
+  micBtn.addEventListener("click", () => {
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+    // agar koi purana session chal raha ho to pehle use band karo,
+    // taaki do sessions ek sath overlap na hon (ye hi "repeat" bug ki wajah thi)
+    try { recognition.abort(); } catch (e) {}
+    setTimeout(() => recognition.start(), 50);
+  });
+} else {
+  micBtn.disabled = true;
+  micBtn.style.opacity = "0.4";
+  statusEl.textContent = "Voice recording sirf Chrome browser mein chalega";
+}
+
+// ------------------------------------------------------------------
+// Study Planner - schedule add/dikhaana/reminder
+// Data browser mein hi (localStorage) save hota hai, agli baar
+// file kholne par bhi schedule wahin milega.
+// ------------------------------------------------------------------
+const DAY_NAMES_HI = {
+  Monday: "Somvaar", Tuesday: "Mangalvaar", Wednesday: "Budhvaar",
+  Thursday: "Guruvaar", Friday: "Shukravaar", Saturday: "Shanivaar", Sunday: "Ravivaar"
+};
+const JS_DAY_TO_NAME = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+const scheduleOverlay = document.getElementById("scheduleOverlay");
+const scheduleBtn = document.getElementById("scheduleBtn");
+const closePanel = document.getElementById("closePanel");
+const subjectInput = document.getElementById("subjectInput");
+const dayInput = document.getElementById("dayInput");
+const timeInput = document.getElementById("timeInput");
+const addScheduleBtn = document.getElementById("addScheduleBtn");
+const scheduleListEl = document.getElementById("scheduleList");
+const emptyScheduleEl = document.getElementById("emptySchedule");
+
+function loadSchedule() {
+  try {
+    return JSON.parse(localStorage.getItem("auraSchedule") || "[]");
+  } catch (e) { return []; }
+}
+function saveSchedule(list) {
+  localStorage.setItem("auraSchedule", JSON.stringify(list));
+}
+
+function timeToMinutes(t) {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function renderSchedule() {
+  const list = loadSchedule().sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
+  scheduleListEl.innerHTML = "";
+  emptyScheduleEl.style.display = list.length ? "none" : "block";
+
+  const todayName = JS_DAY_TO_NAME[new Date().getDay()];
+  let hasToday = false;
+
+  list.forEach((item) => {
+    if (item.day === todayName) hasToday = true;
+    const row = document.createElement("div");
+    row.className = "schedItem" + (item.day === todayName ? " today" : "");
+    row.innerHTML = `
+      <div class="schedTime">${item.time}</div>
+      <div class="schedInfo">
+        <div class="schedSubject">${item.subject}</div>
+        <div class="schedDay">${DAY_NAMES_HI[item.day] || item.day}</div>
+      </div>
+      <button class="schedDelete" data-id="${item.id}">🗑</button>
+    `;
+    scheduleListEl.appendChild(row);
+  });
+
+  scheduleBtn.classList.toggle("hasToday", hasToday);
+
+  scheduleListEl.querySelectorAll(".schedDelete").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const updated = loadSchedule().filter((it) => it.id !== id);
+      saveSchedule(updated);
+      renderSchedule();
+    });
+  });
+}
+
+function addScheduleEntry(subject, day, time) {
+  if (!subject || !day || !time) return false;
+  const list = loadSchedule();
+  list.push({ id: Date.now().toString(), subject, day, time, notifiedAt: null });
+  saveSchedule(list);
+  renderSchedule();
+  return true;
+}
+
+addScheduleBtn.addEventListener("click", () => {
+  const ok = addScheduleEntry(subjectInput.value.trim(), dayInput.value, timeInput.value);
+  if (ok) {
+    subjectInput.value = "";
+    timeInput.value = "";
+  }
+});
+
+scheduleBtn.addEventListener("click", () => {
+  renderSchedule();
+  scheduleOverlay.classList.add("open");
+});
+closePanel.addEventListener("click", () => scheduleOverlay.classList.remove("open"));
+scheduleOverlay.addEventListener("click", (e) => {
+  if (e.target === scheduleOverlay) scheduleOverlay.classList.remove("open");
+});
+
+// ---- Chat se schedule add/dekhna (voice ya text dono se) ----
+// Example: "schedule: Maths | Monday | 17:00"  ya  "padhai: Physics | Tuesday | 18:30"
+function tryHandleScheduleCommand(text) {
+  const lower = text.toLowerCase();
+
+  if ((lower.startsWith("schedule:") || lower.startsWith("padhai:")) && text.includes("|")) {
+    const content = text.split(":").slice(1).join(":").trim();
+    const parts = content.split("|").map((p) => p.trim());
+    if (parts.length === 3) {
+      const [subject, dayRaw, time] = parts;
+      const dayMatch = Object.keys(DAY_NAMES_HI).find(
+        (d) => d.toLowerCase() === dayRaw.toLowerCase() ||
+               DAY_NAMES_HI[d].toLowerCase() === dayRaw.toLowerCase()
+      );
+      if (dayMatch && /^\d{1,2}:\d{2}$/.test(time)) {
+        addScheduleEntry(subject, dayMatch, time);
+        return `✅ Schedule add ho gaya: ${subject} — ${DAY_NAMES_HI[dayMatch]} ${time} baje.`;
+      }
+      return "Format thoda galat hai. Aise likho: schedule: Maths | Monday | 17:00";
+    }
+  }
+
+  if (lower.includes("schedule") && (lower.includes("dikha") || lower.includes("batao") || lower.includes("kya hai"))) {
+    const todayName = JS_DAY_TO_NAME[new Date().getDay()];
+    const todayItems = loadSchedule()
+      .filter((i) => i.day === todayName)
+      .sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
+    if (todayItems.length === 0) return `Aaj (${DAY_NAMES_HI[todayName]}) ke liye koi schedule nahi hai.`;
+    const lines = todayItems.map((i) => `• ${i.time} — ${i.subject}`).join("\n");
+    return `Aaj (${DAY_NAMES_HI[todayName]}) ka schedule:\n${lines}`;
+  }
+
+  return null;
+}
+
+// ---- Reminder checker: har 20 second mein check karta hai ----
+function checkReminders() {
+  const now = new Date();
+  const todayName = JS_DAY_TO_NAME[now.getDay()];
+  const currentHM = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+  const list = loadSchedule();
+  let changed = false;
+
+  list.forEach((item) => {
+    if (item.day === todayName && item.time === currentHM && item.notifiedAt !== currentHM + "_" + now.toDateString()) {
+      item.notifiedAt = currentHM + "_" + now.toDateString();
+      changed = true;
+      addMessage(`⏰ Reminder: abhi "${item.subject}" padhne ka time hai!`, "bot");
+      if (window.Notification && Notification.permission === "granted") {
+        new Notification("Aura — Study Reminder", { body: `${item.subject} padhne ka time ho gaya!` });
+      }
+    }
+  });
+
+  if (changed) saveSchedule(list);
+}
+setInterval(checkReminders, 20000);
+if (window.Notification && Notification.permission === "default") {
+  Notification.requestPermission();
+}
+
+renderSchedule();
+
+// ------------------------------------------------------------------
+// Local Offline AI (WebLLM) - sabke liye free, koi key nahi chahiye
+// Pehli baar 🧠 dabane par model browser ke andar download hota hai
+// (koi alag link/app download nahi karna - sab isi file ke andar hai)
+// ------------------------------------------------------------------
+const brainBtn = document.getElementById("brainBtn");
+let localEngine = null;
+let localAIReady = false;
+let localAILoading = false;
+
+brainBtn.addEventListener("click", async () => {
+  if (localAIReady) {
+    addMessage("🧠 Local AI already ready hai — main abhi offline hi jawab de raha hoon.", "bot");
+    return;
+  }
+  if (localAILoading) return;
+
+  if (!navigator.gpu) {
+    addMessage("Ye browser WebGPU support nahi karta, isliye local AI yahan nahi chal payega. Latest Chrome (desktop ya recent Android phone) try karo.", "bot");
+    return;
+  }
+
+  localAILoading = true;
+  brainBtn.disabled = true;
+  addMessage("🧠 Local AI download ho raha hai (ek hi baar hota hai, thoda time lagega — WiFi use karo)...", "bot");
+  statusEl.textContent = "🧠 Shuru ho raha hai...";
+
+  try {
+    const webllm = await import("https://esm.run/@mlc-ai/web-llm");
+    localEngine = await webllm.CreateMLCEngine("Llama-3.2-1B-Instruct-q4f16_1-MLC", {
+      initProgressCallback: (report) => {
+        statusEl.textContent = "🧠 " + Math.round((report.progress || 0) * 100) + "% download ho raha hai...";
+      }
+    });
+    localAIReady = true;
+    brainBtn.classList.add("ready");
+    statusEl.textContent = "";
+    addMessage("✅ Local AI ready hai! Ab bina internet ke, poori privacy ke saath, genuinely samajhkar jawab dunga.", "bot");
+  } catch (err) {
+    statusEl.textContent = "";
+    addMessage("Local AI load nahi ho paaya: " + (err.message || "kuch galat hua") + ". Phone/browser shayad support nahi karta.", "bot");
+  } finally {
+    localAILoading = false;
+    brainBtn.disabled = false;
+  }
+});
+
+// Welcome message
+addMessage("Namaste! Main Aura hoon. Mic dabao aur bolo, ya text likh kar bhejo. Koi bhi sawal poochho — jo mujhe pehle se nahi pata hoga wo main Wikipedia par dhundh kar batata hoon.", "bot");
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('aura-sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
