@@ -401,8 +401,6 @@
     padding: 24px 0;
   }
 </style>
-<link rel="manifest" href="aura-manifest.json">
-<meta name="theme-color" content="#7c5cfc">
 </head>
 <body>
 
@@ -414,26 +412,7 @@
   </div>
   <button id="brainBtn" title="Local AI (offline, free)">🧠</button>
   <button id="scheduleBtn" title="Study Planner">📅</button>
-  <button id="settingsBtn" title="Settings" onclick="openAuraSettings()">⚙️</button>
   <div id="premiumBadge">Premium</div>
-</div>
-
-<div id="auraSettingsOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,10,24,0.85);z-index:9999;">
-  <div style="max-width:420px;margin:60px auto;background:var(--bg-1,#12112a);border-radius:16px;padding:20px;max-height:80vh;overflow-y:auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h2 style="margin:0;color:#f2f0ff;">⚙️ Settings</h2>
-      <button onclick="closeAuraSettings()" style="background:none;border:none;color:#f2f0ff;font-size:22px;cursor:pointer;">✕</button>
-    </div>
-
-    <div style="margin-bottom:20px;">
-      <div style="font-weight:600;color:#f2f0ff;margin-bottom:8px;">💬 Chat History</div>
-      <div id="auraHistoryList" style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;"></div>
-      <div style="font-size:12px;color:#9891c4;margin-top:8px;" id="auraHistoryEmpty">Koi purani chat nahi hai abhi.</div>
-    </div>
-
-    <button onclick="startNewAuraChat()" style="width:100%;padding:10px;border-radius:10px;border:none;background:#7c5cfc;color:white;font-weight:600;margin-bottom:10px;cursor:pointer;">➕ Nayi Chat Shuru Karo</button>
-    <button onclick="clearAllAuraHistory()" style="width:100%;padding:10px;border-radius:10px;border:1px solid #f5b942;background:none;color:#f5b942;font-weight:600;cursor:pointer;">🗑️ Sari History Delete Karo</button>
-  </div>
 </div>
 
 
@@ -499,7 +478,7 @@
 // (jaise "https://aura-backend.onrender.com"). Khaali "" rakhoge to
 // sirf offline/local AI hi kaam karega.
 // ------------------------------------------------------------------
-const GEMINI_API_KEY = 'GEMINI_API_KEY_HERE'; // Yahan apni naye Gemini key daalo
+const BACKEND_URL = "https://scheduleapp.sheduletimer.workers.dev";
 
 // ------------------------------------------------------------------
 // Knowledge base - yahan apne sawal/jawab add kar sakte ho
@@ -550,94 +529,8 @@ function addMessage(text, sender) {
   row.appendChild(bubble);
   chatBox.appendChild(row);
   chatBox.scrollTop = chatBox.scrollHeight;
-  saveCurrentAuraMessage(text, sender);
   return row;
 }
-
-// ===== Settings + Chat History =====
-function getAuraHistorySessions(){
-  try{ return JSON.parse(localStorage.getItem("auraChatSessions") || "[]"); }catch(e){ return []; }
-}
-function saveAuraHistorySessions(sessions){
-  localStorage.setItem("auraChatSessions", JSON.stringify(sessions));
-}
-function getCurrentAuraSessionId(){
-  let id = localStorage.getItem("auraCurrentSessionId");
-  if(!id){
-    id = "s_" + Date.now();
-    localStorage.setItem("auraCurrentSessionId", id);
-  }
-  return id;
-}
-function saveCurrentAuraMessage(text, sender){
-  const sessions = getAuraHistorySessions();
-  const id = getCurrentAuraSessionId();
-  let session = sessions.find(s => s.id === id);
-  if(!session){
-    session = { id, title: text.slice(0,40), startedAt: Date.now(), messages: [] };
-    sessions.unshift(session);
-  }
-  session.messages.push({ text, sender, at: Date.now() });
-  saveAuraHistorySessions(sessions);
-}
-function openAuraSettings(){
-  renderAuraHistoryList();
-  document.getElementById("auraSettingsOverlay").style.display = "block";
-}
-function closeAuraSettings(){
-  document.getElementById("auraSettingsOverlay").style.display = "none";
-}
-function renderAuraHistoryList(){
-  const list = document.getElementById("auraHistoryList");
-  const empty = document.getElementById("auraHistoryEmpty");
-  const sessions = getAuraHistorySessions();
-  list.innerHTML = "";
-  if(sessions.length === 0){
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-  sessions.forEach(s => {
-    const item = document.createElement("div");
-    item.style.cssText = "padding:10px;background:rgba(124,92,252,0.12);border-radius:10px;cursor:pointer;color:#f2f0ff;font-size:13px;";
-    const d = new Date(s.startedAt);
-    item.textContent = (s.title || "Chat") + " — " + d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    item.onclick = () => loadAuraSession(s.id);
-    list.appendChild(item);
-  });
-}
-function loadAuraSession(id){
-  const sessions = getAuraHistorySessions();
-  const session = sessions.find(s => s.id === id);
-  if(!session) return;
-  localStorage.setItem("auraCurrentSessionId", id);
-  chatBox.innerHTML = "";
-  session.messages.forEach(m => {
-    const row = document.createElement("div");
-    row.className = "row " + m.sender;
-    const bubble = document.createElement("div");
-    bubble.className = "msg";
-    bubble.textContent = m.text;
-    row.appendChild(bubble);
-    chatBox.appendChild(row);
-  });
-  chatBox.scrollTop = chatBox.scrollHeight;
-  closeAuraSettings();
-}
-function startNewAuraChat(){
-  localStorage.removeItem("auraCurrentSessionId");
-  chatBox.innerHTML = "";
-  closeAuraSettings();
-  addMessage("Namaste! Main Aura hoon, aapka AI. Kya madad karu?", "bot");
-}
-function clearAllAuraHistory(){
-  if(!confirm("Sari chat history delete ho jayegi. Pakka?")) return;
-  localStorage.removeItem("auraChatSessions");
-  localStorage.removeItem("auraCurrentSessionId");
-  renderAuraHistoryList();
-  chatBox.innerHTML = "";
-}
-
 
 function showTyping() {
   const row = document.createElement("div");
@@ -702,28 +595,25 @@ async function handleUserMessage(text) {
     return;
   }
 
-  // Agar internet hai aur Gemini key set hai, to pehle seedha Gemini se try karo
-  if (GEMINI_API_KEY !== 'GEMINI_API_KEY_HERE' && navigator.onLine) {
+  // Agar internet hai aur backend URL set hai, to pehle backend se try karo
+  // (backend ke andar API key chhipi rahegi, kabhi frontend mein nahi aayegi)
+  if (BACKEND_URL && navigator.onLine) {
     showTyping();
     try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
+      const res = await fetch(`${BACKEND_URL}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text }] }],
-          systemInstruction: { parts: [{ text: "Tum Aura ho, ek friendly AI assistant jo Hinglish (Hindi+English mix) mein natural, chhote aur seedhe jawab deta hai." }] }
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
       });
       const data = await res.json();
       hideTyping();
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (reply) {
-        addMessage(reply.trim(), "bot");
+      if (data && data.reply) {
+        addMessage(data.reply, "bot");
         return;
       }
     } catch (err) {
       hideTyping();
-      // internet hoke bhi Gemini fail ho gaya -> neeche offline fallback pe chala jayega
+      // internet hoke bhi backend fail ho gaya -> neeche offline fallback pe chala jayega
     }
   }
 
@@ -1058,12 +948,5 @@ brainBtn.addEventListener("click", async () => {
 addMessage("Namaste! Main Aura hoon. Mic dabao aur bolo, ya text likh kar bhejo. Koi bhi sawal poochho — jo mujhe pehle se nahi pata hoga wo main Wikipedia par dhundh kar batata hoon.", "bot");
 </script>
 
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('aura-sw.js').catch(()=>{});
-  });
-}
-</script>
 </body>
 </html>
