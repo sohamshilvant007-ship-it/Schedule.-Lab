@@ -1,4 +1,4 @@
-const CACHE_NAME = 'schedule-lab-v5';
+const CACHE_NAME = 'schedule-lab-v6';
 const ASSETS = [
   './index.html',
   './manifest.json',
