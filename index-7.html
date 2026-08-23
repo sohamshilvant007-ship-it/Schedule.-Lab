@@ -1,0 +1,3150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Schedule Lab — TARGET ELITE AI</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b0b14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Schedule Lab">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --neon-blue:#2dd4bf;
+    --neon-purple:#ff7a59;
+    --bg-deep:#050f0d;
+    --bg-surface:#0f2420;
+    --glass-fill:rgba(255,255,255,0.07);
+    --glass-border:rgba(255,255,255,0.14);
+    --text-primary:#f5f6fa;
+    --text-secondary:#9bb0ac;
+    --success:#2bd97c;
+    --warning:#ffb020;
+    --danger:#ff5c7a;
+    --gold:#ffb648;
+    --gold-dark:#d98f2b;
+    --glow-blue:rgba(45,212,191,0.35);
+    --glow-purple:rgba(255,122,89,0.3);
+  }
+  body.light-mode{
+    --bg-deep:#f7f7f2;
+    --bg-surface:#ffffff;
+    --glass-fill:rgba(20,25,20,0.04);
+    --glass-border:rgba(20,25,20,0.12);
+    --text-primary:#14201d;
+    --text-secondary:#5c6b66;
+  }
+  body.light-mode{ background:linear-gradient(180deg,var(--bg-deep),#eef1ea); }
+  *{box-sizing:border-box;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:0.01ms !important;transition-duration:0.01ms !important;} }
+  body{
+    margin:0;
+    font-family:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+    background:linear-gradient(180deg,var(--bg-deep),#0d1f19);
+    color:var(--text-primary);
+    min-height:100vh;
+    padding-bottom:80px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* SIGNATURE — aurora glow drifting behind the app, evokes light moving through time */
+  body::before{
+    content:'';position:fixed;top:-30%;left:-20%;width:70vw;height:70vw;max-width:520px;max-height:520px;
+    background:radial-gradient(circle,var(--glow-blue) 0%,transparent 70%);
+    filter:blur(40px);pointer-events:none;z-index:0;
+    animation:auroraDrift1 18s ease-in-out infinite;
+  }
+  body::after{
+    content:'';position:fixed;bottom:-25%;right:-20%;width:70vw;height:70vw;max-width:520px;max-height:520px;
+    background:radial-gradient(circle,var(--glow-purple) 0%,transparent 70%);
+    filter:blur(40px);pointer-events:none;z-index:0;
+    animation:auroraDrift2 22s ease-in-out infinite;
+  }
+  @keyframes auroraDrift1{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(8%,10%) scale(1.15);}
+  }
+  @keyframes auroraDrift2{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(-6%,-8%) scale(1.1);}
+  }
+  header, .container, nav.bottom{position:relative;z-index:1;}
+  h1,h2,h3{font-family:'Sora',sans-serif;}
+  header{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 20px;position:sticky;top:0;z-index:10;
+    background:rgba(7,7,13,0.75);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--glass-border);
+  }
+  header h1{font-size:19px;margin:0;font-family:'Sora',sans-serif;font-weight:700;letter-spacing:-0.02em;
+    background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple),var(--gold));
+    background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:shimmerText 6s ease-in-out infinite;}
+  @keyframes shimmerText{0%,100%{background-position:0% center;}50%{background-position:100% center;}}
+  #langBtn{background:var(--glass-fill);border:1px solid var(--glass-border);
+    color:var(--text-primary);padding:8px 12px;border-radius:10px;cursor:pointer;transition:transform .15s ease,border-color .15s ease;}
+  #langBtn:active{transform:scale(0.94);}
+  #profileBtn{background:var(--glass-fill);border:1px solid var(--glass-border);
+    color:var(--text-primary);padding:8px 12px;border-radius:10px;cursor:pointer;font-size:15px;transition:transform .15s ease,box-shadow .15s ease;}
+  #profileBtn:active{transform:scale(0.9);}
+  #menuBtn{background:var(--glass-fill);border:1px solid var(--glass-border);
+    width:38px;height:38px;border-radius:10px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    transition:transform .15s ease;}
+  #menuBtn:active{transform:scale(0.9);}
+  #menuBtn span{display:block;width:16px;height:2px;border-radius:2px;background:var(--text-primary);}
+  #appLogo{flex-shrink:0;animation:pulseLogo 3s ease-in-out infinite;}
+
+  #appMenuOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;
+    display:none;backdrop-filter:blur(2px);}
+  #appMenuOverlay.open{display:block;animation:fadeIn .2s ease;}
+  #appMenuPanel{position:fixed;top:0;left:0;bottom:0;width:78%;max-width:300px;
+    background:var(--bg-surface);border-right:1px solid var(--glass-border);
+    z-index:101;padding:20px 16px;transform:translateX(-100%);transition:transform .25s ease;
+    overflow-y:auto;}
+  #appMenuOverlay.open #appMenuPanel{transform:translateX(0);}
+  .app-menu-item{display:flex;align-items:center;gap:12px;padding:13px 10px;border-radius:12px;
+    cursor:pointer;color:var(--text-primary);font-size:14.5px;font-weight:600;
+    transition:background .15s ease;}
+  .app-menu-item:active{background:var(--glass-fill);}
+  .app-menu-item .icon{font-size:19px;width:24px;text-align:center;}
+  .app-menu-divider{height:1px;background:var(--glass-border);margin:10px 0;}
+
+  /* GOOGLE TRANSLATE WIDGET */
+  #google_translate_element{display:inline-block;}
+  .goog-te-gadget{font-family:inherit !important;color:transparent !important;font-size:0 !important;}
+  .goog-te-gadget .goog-te-combo{
+    background:var(--glass-fill);border:1px solid var(--glass-border);
+    color:var(--text-primary);padding:7px 8px;border-radius:10px;
+    font-size:12px !important;cursor:pointer;max-width:110px;
+  }
+  .goog-te-banner-frame{display:none !important;}
+  body{top:0 !important;}
+  .goog-logo-link, .goog-te-gadget span{display:none !important;}
+
+  .live-clock-row{
+    display:flex;justify-content:center;align-items:baseline;gap:10px;
+    padding:6px 16px 2px;font-variant-numeric:tabular-nums;
+  }
+  .live-clock-row #liveClock{
+    font-size:22px;font-weight:700;letter-spacing:1px;
+    background:linear-gradient(90deg,var(--neon-blue),var(--gold));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .live-clock-row #liveDate{font-size:12px;color:var(--text-secondary);}
+
+  .glass{
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    border-radius:18px;
+    padding:16px;
+    margin-bottom:12px;
+    backdrop-filter:blur(10px);
+    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+    animation:cardRise .35s ease backwards;
+  }
+  .glass:active{transform:scale(0.98);}
+  @keyframes cardRise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  .container{max-width:520px;margin:0 auto;padding:16px;}
+
+  .btn{
+    background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+    color:#fff;border:none;padding:14px 20px;border-radius:14px;
+    font-weight:600;font-size:15px;cursor:pointer;width:100%;
+    box-shadow:0 4px 18px -6px var(--glow-blue);
+    transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+  }
+  .btn:active{transform:scale(0.97);filter:brightness(1.08);}
+  .btn.secondary{background:var(--glass-fill);border:1px solid var(--glass-border);box-shadow:none;}
+  .btn.small{width:auto;padding:8px 14px;font-size:13px;border-radius:10px;}
+
+  input,select,textarea{
+    width:100%;background:var(--glass-fill);border:1px solid var(--glass-border);
+    color:var(--text-primary);padding:12px;border-radius:12px;margin:8px 0;
+    font-size:14px;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;
+  }
+  input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--neon-blue);background:var(--glass-fill-strong,var(--glass-fill));
+    box-shadow:0 0 0 3px var(--glow-blue);
+  }
+  label{font-size:13px;color:var(--text-secondary);}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;}
+  .chip{padding:8px 14px;border-radius:20px;border:1px solid var(--glass-border);
+    cursor:pointer;font-size:13px;color:var(--text-secondary);
+    transition:transform .15s ease,background .15s ease,color .15s ease,border-color .15s ease;}
+  .chip:active{transform:scale(0.94);}
+  .chip.active{background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+    color:#fff;border:none;box-shadow:0 3px 14px -4px var(--glow-blue);}
+
+  .progress-bar-wrap{width:100%;background:var(--glass-fill);height:6px;border-radius:4px;overflow:hidden;margin:4px 0 16px;}
+  .progress-bar{height:100%;background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple),var(--gold));
+    background-size:200% auto;width:0%;transition:width .5s ease;
+    animation:shimmerText 4s ease-in-out infinite;box-shadow:0 0 10px var(--glow-blue);}
+
+  .step{display:none;}
+  .step.active{display:block;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  .task-card{display:flex;gap:12px;align-items:flex-start;}
+  .task-icon{width:42px;height:42px;border-radius:50%;
+    background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple));
+    display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+    box-shadow:0 3px 12px -3px var(--glow-purple);}
+  .task-title-row{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .task-title{font-weight:600;font-size:15px;transition:color .2s ease;}
+  .task-title.done{text-decoration:line-through;color:var(--text-secondary);}
+  .badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;
+    border:1px solid transparent;letter-spacing:.02em;}
+  .badge.low{background:rgba(160,163,184,.15);color:var(--text-secondary);}
+  .badge.medium{background:rgba(90,169,255,.15);color:var(--neon-blue);border-color:rgba(90,169,255,.25);}
+  .badge.high{background:rgba(255,200,87,.15);color:var(--warning);border-color:rgba(255,200,87,.25);}
+  .badge.critical{background:rgba(255,92,122,.15);color:var(--danger);border-color:rgba(255,92,122,.3);}
+  .task-time{font-size:12px;color:var(--text-secondary);margin:4px 0;}
+  .task-actions{display:flex;gap:8px;margin-top:8px;}
+  .action-btn{padding:7px 12px;border-radius:10px;font-size:12px;font-weight:600;
+    border:1px solid transparent;cursor:pointer;background:none;
+    transition:transform .15s ease,filter .15s ease;}
+  .action-btn:active{transform:scale(0.94);filter:brightness(1.15);}
+  .action-btn.start{background:rgba(90,169,255,.15);color:var(--neon-blue);}
+  .action-btn.complete{background:rgba(43,217,124,.15);color:var(--success);}
+  .action-btn.skip{border-color:rgba(160,163,184,.4);color:var(--text-secondary);}
+
+  nav.bottom{
+    position:fixed;bottom:0;left:0;right:0;
+    background:rgba(19,18,35,0.8);backdrop-filter:blur(16px);
+    border-top:1px solid var(--glass-border);
+    display:flex;justify-content:space-around;padding:10px 0;z-index:10;
+  }
+  body.light-mode nav.bottom{background:rgba(255,255,255,0.8);}
+  nav.bottom button{
+    background:none;border:none;color:var(--text-secondary);font-size:11px;
+    display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;
+    position:relative;padding:4px 10px;transition:color .2s ease,transform .15s ease;
+  }
+  nav.bottom button:active{transform:scale(0.92);}
+  nav.bottom button.active{color:var(--neon-blue);}
+  nav.bottom button.active::before{
+    content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+    width:18px;height:3px;border-radius:3px;
+    background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+    box-shadow:0 0 8px var(--glow-blue);
+  }
+  nav.bottom .icon{font-size:20px;transition:transform .2s ease;}
+  nav.bottom button.active .icon{transform:translateY(-1px) scale(1.08);}
+
+  .tab-page{display:none;}
+  .tab-page.active{display:block;animation:tabIn .28s ease;}
+  @keyframes tabIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+  .stat-tile{text-align:center;}
+  .stat-value{font-size:20px;font-weight:700;}
+  .stat-label{font-size:11px;color:var(--text-secondary);margin-top:4px;}
+
+  .ring-wrap{display:flex;justify-content:center;margin:20px 0;}
+  .ring{position:relative;width:180px;height:180px;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;font-size:32px;font-weight:700;}
+
+  #focusOverlay{
+    position:fixed;inset:0;background:var(--bg-deep);z-index:50;
+    display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;
+  }
+  #focusOverlay.active{display:flex;}
+  .quote{font-style:italic;color:var(--text-secondary);text-align:center;margin:20px 0;}
+  .focus-controls{display:flex;gap:20px;margin-top:30px;}
+  .round-btn{width:64px;height:64px;border-radius:50%;border:none;font-size:24px;
+    background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple));color:#fff;cursor:pointer;}
+  .round-btn.outline{background:none;border:2px solid var(--success);color:var(--success);}
+  .close-focus{position:absolute;top:24px;left:20px;background:none;border:none;color:var(--text-primary);font-size:22px;cursor:pointer;}
+
+  .day-pill{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+    width:52px;height:64px;border-radius:14px;margin-right:8px;border:1px solid var(--glass-border);
+    background:var(--glass-fill);cursor:pointer;font-size:12px;flex-shrink:0;}
+  .day-pill.active{background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple));border:none;}
+  .day-strip{display:flex;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;}
+
+  .empty-state{text-align:center;padding:40px 16px;color:var(--text-secondary);}
+
+  /* PREMIUM */
+  .premium-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    background:linear-gradient(90deg,var(--gold-dark),var(--gold));
+    color:#241a02;font-size:10px;font-weight:800;letter-spacing:.3px;
+    padding:3px 9px;border-radius:20px;margin-left:8px;vertical-align:middle;
+    box-shadow:0 0 10px rgba(240,193,75,.4);
+  }
+  .glass.premium{border-color:rgba(240,193,75,.4);box-shadow:0 0 16px rgba(240,193,75,.08);}
+
+  /* CHAT / REMINDERS */
+  .chat-bubble{
+    display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;
+  }
+  .chat-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple));
+    display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .chat-bubble.now .chat-avatar{background:linear-gradient(135deg,var(--gold-dark),var(--gold));}
+  .chat-content{
+    background:var(--glass-fill);border:1px solid var(--glass-border);
+    border-radius:4px 16px 16px 16px;padding:10px 14px;max-width:82%;
+  }
+  .chat-bubble.now .chat-content{border-color:rgba(240,193,75,.5);}
+  .chat-name{font-size:11px;color:var(--text-secondary);margin-bottom:3px;font-weight:600;}
+  .chat-text{font-size:14px;line-height:1.4;}
+  .chat-time{font-size:10px;color:var(--text-secondary);margin-top:4px;}
+  .now-tag{display:inline-block;background:rgba(240,193,75,.15);color:var(--gold);
+    font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;}
+  .alert-toggle-row{display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:14px;}
+  .alert-toggle-row .status{font-size:12px;color:var(--text-secondary);}
+
+  /* TASK MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:60;
+    display:none;align-items:flex-end;justify-content:center;}
+  .modal-overlay.active{display:flex;}
+  .modal-sheet{background:var(--bg-surface);border-top-left-radius:22px;border-top-right-radius:22px;
+    width:100%;max-width:520px;padding:20px;max-height:88vh;overflow-y:auto;
+    animation:fadeIn .25s ease;}
+  .modal-sheet h3{margin:0 0 4px;}
+  .modal-row{display:flex;gap:10px;}
+  .modal-row > *{flex:1;}
+  .modal-actions{display:flex;gap:10px;margin-top:14px;}
+  .icon-btn{background:var(--glass-fill);border:1px solid var(--glass-border);
+    color:var(--text-secondary);width:34px;height:34px;border-radius:10px;
+    cursor:pointer;font-size:14px;flex-shrink:0;}
+  .section-head{display:flex;justify-content:space-between;align-items:center;}
+
+  /* PROFILE PHOTO */
+  .profile-photo-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:14px;}
+  .profile-photo{width:88px;height:88px;border-radius:50%;object-fit:cover;
+    border:3px solid var(--glass-border);background:var(--glass-fill);
+    display:flex;align-items:center;justify-content:center;font-size:34px;}
+  #profileBtn.has-photo{padding:2px;overflow:hidden;}
+  #profileBtn.has-photo img{width:26px;height:26px;border-radius:50%;object-fit:cover;display:block;}
+  .google-btn-wrap{display:flex;justify-content:center;margin-top:14px;}
+  .or-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text-secondary);font-size:12px;}
+  .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--glass-border);}
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+<!-- SPLASH SCREEN (shows ~2s on app start) -->
+<div id="splashScreen" style="position:fixed;inset:0;z-index:300;
+  background:linear-gradient(180deg,#050f0d,#0d1f19);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;">
+  <svg width="54" height="54" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:splashLogoIn .8s cubic-bezier(.34,1.56,.64,1) both;">
+    <path d="M6 3H20M6 23H20M7 3C7 8 13 10 13 13C13 16 7 18 7 23M19 3C19 8 13 10 13 13C13 16 19 18 19 23"
+      stroke="url(#splashGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <defs>
+      <linearGradient id="splashGrad" x1="0" y1="0" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#2dd4bf"/>
+        <stop offset="1" stop-color="#ffb648"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;letter-spacing:-0.02em;
+    background:linear-gradient(90deg,#2dd4bf,#ff7a59,#ffb648);background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:shimmerText 2s ease-in-out infinite, splashTextIn .6s ease .15s both;">Schedule Lab</div>
+</div>
+<style>
+@keyframes splashLogoIn{from{opacity:0;transform:scale(0.5) rotate(-15deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+@keyframes splashTextIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes splashOut{from{opacity:1;}to{opacity:0;visibility:hidden;}}
+</style>
+
+<!-- DAILY TIME LIMIT LOCK SCREEN -->
+<div id="timeLimitLockScreen" style="display:none;position:fixed;inset:0;z-index:400;
+  background:linear-gradient(180deg,#050f0d,#0d1f19);
+  flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;">
+  <div style="font-size:48px;">⏳</div>
+  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;color:#fff;" id="timeLimitLockTitle">Time's up for today!</div>
+  <div style="font-size:13px;color:var(--text-secondary,#9fb3ac);max-width:280px;" id="timeLimitLockMsg">You've used your daily limit for Schedule Lab. It'll unlock automatically at midnight.</div>
+</div>
+
+<!-- OFFLINE SCREEN -->
+<div id="offlineScreen" style="display:none;position:fixed;inset:0;z-index:200;
+  background:#0b0b14;flex-direction:column;align-items:center;justify-content:center;gap:18px;">
+  <svg width="120" height="120" viewBox="0 0 512 512" style="animation:pulseLogo 1.8s ease-in-out infinite;">
+    <defs>
+      <linearGradient id="offBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4da6ff"/>
+        <stop offset="100%" stop-color="#a35cff"/>
+      </linearGradient>
+      <linearGradient id="offGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f0c14b"/>
+        <stop offset="100%" stop-color="#c9971f"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#offBgGrad)"/>
+    <circle cx="256" cy="266" r="132" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.35)" stroke-width="6"/>
+    <path d="M 198 270 L 238 308 L 322 216" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="256" cy="266" r="10" fill="url(#offGoldGrad)"/>
+  </svg>
+  <div style="color:var(--text-secondary,#9a9ab0);font-size:13px;text-align:center;padding:0 30px;" id="offlineMsg" data-t="offlineMsg">
+    No internet connection...
+  </div>
+</div>
+<style>
+@keyframes pulseLogo{ 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.6;transform:scale(0.94);} }
+</style>
+
+
+<header>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button id="menuBtn" onclick="openAppMenu()" title="Menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <svg id="appLogo" width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M6 3H20M6 23H20M7 3C7 8 13 10 13 13C13 16 7 18 7 23M19 3C19 8 13 10 13 13C13 16 19 18 19 23"
+        stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <defs>
+        <linearGradient id="logoGrad" x1="0" y1="0" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+          <stop stop-color="var(--neon-blue)"/>
+          <stop offset="1" stop-color="var(--gold)"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <h1 id="appTitle">Schedule Lab<span class="premium-badge">⭐ PREMIUM</span></h1>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button id="installAppBtn" onclick="installApp()" style="display:none;background:linear-gradient(90deg,var(--gold-dark),var(--gold));border:none;color:#241a02;font-weight:700;padding:8px 12px;border-radius:10px;cursor:pointer;font-size:12px;">⬇️ Install</button>
+    <div id="google_translate_element" class="notranslate"></div>
+    <button id="profileBtn" onclick="openProfileModal()" title="Profile">👤</button>
+    <button id="langBtn" onclick="toggleLang()">EN / हिंदी</button>
+  </div>
+</header>
+
+<div id="appMenuOverlay" onclick="if(event.target===this) closeAppMenu()">
+  <div id="appMenuPanel">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+      <svg width="24" height="24" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 3H20M6 23H20M7 3C7 8 13 10 13 13C13 16 7 18 7 23M19 3C19 8 13 10 13 13C13 16 19 18 19 23"
+          stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;">Schedule Lab</div>
+    </div>
+    <div class="app-menu-item" onclick="closeAppMenu();switchTab('today')"><span class="icon">📅</span><span data-t="navToday">Today</span></div>
+    <div class="app-menu-item" onclick="closeAppMenu();switchTab('goals')"><span class="icon">🚩</span><span data-t="navGoals">Goals</span></div>
+    <div class="app-menu-item" onclick="closeAppMenu();switchTab('analytics')"><span class="icon">📊</span><span data-t="navAnalytics">Analytics</span></div>
+    <div class="app-menu-item" onclick="closeAppMenu();switchTab('chat')"><span class="icon">💬</span><span data-t="navChat">AI Chat</span></div>
+    <div class="app-menu-divider"></div>
+    <div class="app-menu-item" onclick="closeAppMenu();showStartWorkingPopup()"><span class="icon">🎯</span><span>Focus Mode</span></div>
+    <div class="app-menu-item" onclick="closeAppMenu();openPremiumModal()"><span class="icon">⭐</span><span>Premium</span></div>
+    <div class="app-menu-item" onclick="closeAppMenu();openProfileModal()"><span class="icon">👤</span><span>Profile &amp; Settings</span></div>
+    <div class="app-menu-divider"></div>
+    <div class="app-menu-item" style="color:var(--danger);" onclick="closeAppMenu();logoutUser()"><span class="icon">🚪</span><span data-t="logoutBtn">Logout (Reset App)</span></div>
+  </div>
+</div>
+<div class="live-clock-row" id="liveClockRow">
+  <span id="liveClock">--:--:--</span>
+  <span id="liveDate">--</span>
+</div>
+
+<div class="container">
+
+  <!-- PRIVACY POLICY VIEW (visit index.html#privacy) -->
+  <div id="privacyView" style="display:none;max-width:640px;margin:0 auto;padding:20px;line-height:1.7;">
+    <h1 style="background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));-webkit-background-clip:text;background-clip:text;color:transparent;font-size:26px;">Privacy Policy — Schedule Lab</h1>
+    <p style="color:var(--text-secondary);font-size:13px;">Last updated: July 27, 2026</p>
+    <p>Schedule Lab ("the App") is a personal time-management and daily scheduling app. This Privacy Policy explains what information the App uses and how it is handled.</p>
+
+    <h2 style="color:var(--gold);font-size:17px;margin-top:24px;">1. Data We Collect</h2>
+    <div class="glass">
+      <p>The App asks for the following information directly from you when you use it:</p>
+      <ul>
+        <li><strong>Name and Gmail address</strong> — used only as a local identifier inside the App. This is <em>not</em> verified with Google and is not used for real Google sign-in.</li>
+        <li><strong>Profile details</strong> — age, user type (student/employee/business/other), wake-up and sleep time, work/duty hours, and your main goal.</li>
+        <li><strong>Profile photo</strong> — optional, if you choose to add one.</li>
+        <li><strong>Schedule and task data</strong> — the tasks, goals, and timetable entries you create inside the App.</li>
+      </ul>
+    </div>
+
+    <h2 style="color:var(--gold);font-size:17px;margin-top:24px;">2. Where Your Data Is Stored</h2>
+    <p>All of the data above is stored <strong>locally on your own device</strong>, using your browser/app's local storage. Schedule Lab does <strong>not</strong> operate a server or database, and we do not receive, see, or store a copy of your data on any Schedule Lab server.</p>
+    <p>Because your data lives only on your device, uninstalling the App or clearing app data will permanently delete it, unless you have used the in-app <strong>Export Backup</strong> feature to save a copy yourself.</p>
+
+    <h2 style="color:var(--gold);font-size:17px;margin-top:24px;">3. Third-Party Services</h2>
+    <ul>
+      <li><strong>Google Translate widget:</strong> If you use the in-app language translation dropdown, the page text is sent to Google's translation service to display the App in your chosen language. This is subject to <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--neon-blue);">Google's Privacy Policy</a>.</li>
+      <li>The App does not use any advertising networks and does not sell or share your data with third parties for marketing purposes.</li>
+    </ul>
+
+    <h2 style="color:var(--gold);font-size:17px;margin-top:24px;">4. Notifications</h2>
+    <p>If you enable Task Alerts, the App uses your browser/device's notification permission to remind you when a scheduled task begins. This works only while the App is open in your browser and does not send data anywhere — it is generated and shown entirely on your device.</p>
+
+    <h2 style="color:var(--gold);font-size:17px;margin-top:24px;">5. Backup &amp; Export</h2>
+    <p>The Export/Import Backup feature creates a file containing your profile and schedule data, saved directly to your device's storage by you. This file is never uploaded anywhere by the App — it stays wherever you choose to save or share it.</p>
+
+    <h2 style="color:var(--gold);font-size:17px;margin-top:24px;">6. Children's Privacy</h2>
+    <p>Schedule Lab is a general productivity tool and does not knowingly target or collect data from children in a way that requires special handling, since no data leaves the user's own device.</p>
+
+    <h2 style="color:var(--gold);font-size:17px;margin-top:24px;">7. Your Choices</h2>
+    <ul>
+      <li>You can edit or delete any of your data at any time from within the App (Profile → Edit).</li>
+      <li>You can fully remove your data using the <strong>Logout (Reset App)</strong> option.</li>
+      <li>You can revoke notification permission anytime from your browser/device settings.</li>
+    </ul>
+
+    <h2 style="color:var(--gold);font-size:17px;margin-top:24px;">8. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated date at the top.</p>
+
+    <h2 style="color:var(--gold);font-size:17px;margin-top:24px;">9. Contact Us</h2>
+    <p>If you have questions about this Privacy Policy, contact: <strong>[your email address here]</strong></p>
+  </div>
+
+  <!-- LOGIN GATE -->
+  <div id="loginGate" style="display:none;">
+    <div class="step active" style="text-align:center;">
+      <div style="font-size:44px;margin-bottom:6px;">📅</div>
+      <h2 data-t="loginTitle">Welcome to Schedule Lab</h2>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:18px;" data-t="loginSubtitle">Enter your name and Gmail to continue</p>
+      <label style="text-align:left;display:block;" data-t="loginNameLabel">Name</label>
+      <input id="loginName" type="text" data-t-ph="loginNameLabel">
+      <label style="text-align:left;display:block;" data-t="loginEmailLabel">Gmail</label>
+      <input id="loginEmail" type="email" placeholder="you@gmail.com">
+      <label style="text-align:left;display:block;" data-t="loginPasswordLabel">Password</label>
+      <input id="loginPassword" type="password" placeholder="••••••••">
+      <div style="font-size:11px;color:var(--text-secondary);text-align:left;margin-top:4px;" data-t="loginPasswordNote">Note: this is just a local lock for this app — it does NOT verify your real Gmail password with Google.</div>
+      <div id="loginError" style="color:var(--danger);font-size:12px;margin-top:6px;display:none;"></div>
+      <button class="btn" style="margin-top:16px;width:100%;" onclick="submitLoginGate()" data-t="loginContinue">Continue →</button>
+      <div class="or-divider" data-t="orDivider">or</div>
+      <div class="google-btn-wrap" id="googleSignInBtn"></div>
+    </div>
+  </div>
+
+  <!-- OTP VERIFICATION -->
+  <div id="otpGate" style="display:none;">
+    <div class="step active" style="text-align:center;">
+      <div style="font-size:44px;margin-bottom:6px;">📧</div>
+      <h2 data-t="otpTitle">Verify your email</h2>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;" data-t="otpSubtitle">We sent a 6-digit code to</p>
+      <p id="otpEmailShown" style="color:var(--gold);font-size:13px;font-weight:600;margin-bottom:18px;"></p>
+      <label style="text-align:left;display:block;" data-t="otpLabel">Enter code</label>
+      <input id="otpInput" type="text" inputmode="numeric" maxlength="6" placeholder="000000" style="letter-spacing:6px;text-align:center;font-size:20px;">
+      <div id="otpStatus" style="font-size:12px;margin-top:6px;display:none;"></div>
+      <button class="btn" style="margin-top:16px;width:100%;" onclick="verifyOtp()" data-t="otpVerify">Verify →</button>
+      <button class="btn-secondary" style="margin-top:10px;width:100%;" onclick="sendOtp(true)" data-t="otpResend">Resend code</button>
+      <button class="btn-secondary" style="margin-top:10px;width:100%;" onclick="backFromOtp()" data-t="otpBack">← Back</button>
+    </div>
+  </div>
+
+  <!-- ONBOARDING -->
+  <div id="onboarding" style="display:none;">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="obProgress"></div></div>
+
+    <div class="step active" data-step="1">
+      <h2 data-t="onboardingWelcome">Let's build your perfect day</h2>
+      <label data-t="fullName">Full Name</label>
+      <input id="fullName" type="text" placeholder="Your name">
+      <label data-t="age">Age</label>
+      <input id="age" type="number" placeholder="18">
+      <label data-t="userType">You are a</label>
+      <div class="chips" id="userTypeChips"></div>
+    </div>
+
+    <div class="step" data-step="2">
+      <h2 data-t="onboardingWelcome">Let's build your perfect day</h2>
+      <label data-t="wakeUpTime">Wake-up Time</label>
+      <input id="wakeUpTime" type="time" value="06:30">
+      <label data-t="sleepTime">Sleep Time</label>
+      <input id="sleepTime" type="time" value="22:30">
+    </div>
+
+    <div class="step" data-step="3">
+      <h2 data-t="onboardingWelcome">Let's build your perfect day</h2>
+      <label data-t="dutyTime">School / College / Office Start</label>
+      <input id="dutyStart" type="time" value="09:00">
+      <label data-t="dutyTime">School / College / Office End</label>
+      <input id="dutyEnd" type="time" value="17:00">
+      <label data-t="travelTime">Travel Time (minutes)</label>
+      <input id="travelTime" type="number" value="30">
+      <label data-t="freeTime">Daily Free Time (minutes)</label>
+      <input id="freeTime" type="number" value="120">
+    </div>
+
+    <div class="step" data-step="4">
+      <h2 data-t="onboardingWelcome">Let's build your perfect day</h2>
+      <label data-t="mainGoal">Main Goal</label>
+      <input id="mainGoal" type="text" placeholder="e.g. Crack JEE / Grow business">
+      <label data-t="secondaryGoals">Secondary Goals (comma separated)</label>
+      <textarea id="secondaryGoals" rows="2" placeholder="e.g. Read books, Learn coding"></textarea>
+    </div>
+
+    <button class="btn" id="obNextBtn" onclick="obNext()" data-t="continueBtn">Continue</button>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="mainApp" style="display:none;">
+
+    <!-- TODAY TAB -->
+    <div class="tab-page active" id="tab-today">
+      <div class="section-head">
+        <h2 data-t="today">Today's Schedule</h2>
+        <button class="icon-btn" onclick="openTaskModal(null, todayISO())" title="Add task">➕</button>
+      </div>
+      <div id="taskList"></div>
+    </div>
+
+    <!-- CALENDAR TAB -->
+    <div class="tab-page" id="tab-calendar">
+      <div class="section-head">
+        <h2 data-t="calendar">Calendar</h2>
+        <button class="icon-btn" onclick="openTaskModal(null, state.selectedDay)" title="Add task">➕</button>
+      </div>
+      <div class="day-strip" id="daySelector"></div>
+      <div id="calendarTaskList"></div>
+    </div>
+
+    <!-- ANALYTICS TAB -->
+    <div class="tab-page" id="tab-analytics">
+      <h2 data-t="analytics">Analytics</h2>
+      <div class="ring-wrap">
+        <div class="ring">
+          <svg width="180" height="180">
+            <circle cx="90" cy="90" r="78" stroke="var(--glass-fill)" stroke-width="12" fill="none"/>
+            <circle id="ringProgress" cx="90" cy="90" r="78" stroke="url(#grad1)" stroke-width="12" fill="none"
+              stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490"/>
+            <defs>
+              <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#4da6ff"/>
+                <stop offset="100%" stop-color="#a35cff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="ring-center"><span id="ringPercent">0%</span></div>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="glass stat-tile"><div class="stat-value" id="statFocus">0h</div><div class="stat-label">Focus Hours</div></div>
+        <div class="glass stat-tile"><div class="stat-value" id="statCompleted">0</div><div class="stat-label">Completed</div></div>
+        <div class="glass stat-tile"><div class="stat-value" id="statScore">0</div><div class="stat-label">Productivity</div></div>
+      </div>
+
+      <h3 style="margin-top:22px;" data-t="gamificationTitle">🏆 Your Progress</h3>
+      <div class="glass" style="padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dark),var(--gold));display:flex;align-items:center;justify-content:center;font-weight:800;color:#241a02;font-size:14px;" id="gamLevel">1</div>
+            <div style="font-size:12px;color:var(--text-secondary);" data-t="levelLabel">Level</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:18px;">🔥</span>
+            <span id="gamStreak" style="font-weight:700;font-size:16px;">0</span>
+            <span style="font-size:12px;color:var(--text-secondary);" data-t="dayStreakLabel">day streak</span>
+          </div>
+        </div>
+        <div style="background:var(--glass-fill);border-radius:20px;height:10px;overflow:hidden;">
+          <div id="gamXpBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));transition:width 0.4s;"></div>
+        </div>
+        <div style="margin-top:12px;" id="gamBadges"></div>
+      </div>
+
+      <h3 style="margin-top:22px;" data-t="studyHoursTitle">📈 Study Hours (Last 7 Days)</h3>
+      <div class="glass" style="padding:16px 12px;">
+        <div id="weeklyBarChart" style="display:flex;align-items:flex-end;justify-content:space-between;height:120px;gap:6px;"></div>
+      </div>
+
+      <h3 style="margin-top:22px;" data-t="monthlyTitle">📆 Monthly Summary (Last 30 Days)</h3>
+      <div class="stat-grid">
+        <div class="glass stat-tile"><div class="stat-value" id="statMonthCompleted">0</div><div class="stat-label" data-t="monthCompletedLabel">Completed</div></div>
+        <div class="glass stat-tile"><div class="stat-value" id="statMonthHours">0h</div><div class="stat-label" data-t="monthHoursLabel">Total Hours</div></div>
+        <div class="glass stat-tile"><div class="stat-value" id="statMonthAvg">0</div><div class="stat-label" data-t="monthAvgLabel">Avg / Day</div></div>
+      </div>
+
+      <h3 style="margin-top:22px;" data-t="activityLogTitle">📋 Break Activity Log</h3>
+      <div id="activityLog"></div>
+    </div>
+
+    <!-- GOALS TAB -->
+    <div class="tab-page" id="tab-goals">
+      <h2 data-t="goals">Goals</h2>
+      <div class="chips" id="goalPeriodChips">
+        <div class="chip active" data-period="daily">Daily</div>
+        <div class="chip" data-period="weekly">Weekly</div>
+        <div class="chip" data-period="monthly">Monthly</div>
+        <div class="chip" data-period="yearly">Yearly</div>
+      </div>
+      <div id="goalList"></div>
+      <input id="newGoalTitle" type="text" placeholder="New goal title">
+      <button class="btn" onclick="addGoal()">+ Add Goal</button>
+    </div>
+
+    <!-- CHAT / REMINDERS TAB -->
+    <div class="tab-page" id="tab-chat">
+      <h2 data-t="chatTitle">Reminders</h2>
+      <div class="glass alert-toggle-row">
+        <div>
+          <div style="font-weight:600;font-size:14px;" data-t="alertsLabel">Task Alerts</div>
+          <div class="status" id="alertStatus" data-t="alertsOff">Off — tap to enable</div>
+        </div>
+        <button class="btn small" id="alertBtn" onclick="enableAlerts()" data-t="enableBtn">Enable</button>
+      </div>
+      <div id="chatList"></div>
+
+      <h3 style="margin-top:26px;display:flex;align-items:center;gap:8px;">
+        <span data-t="aiAssistantTitle">🤖 AI Motivation Assistant</span>
+        <span id="aiFreeTimeBadge" style="font-size:11px;font-weight:400;color:var(--text-secondary);background:var(--glass-fill);padding:2px 8px;border-radius:10px;"></span>
+      </h3>
+      <div class="glass" style="padding:0;overflow:hidden;">
+        <div id="aiChatMessages" style="max-height:280px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;"></div>
+        <div style="display:flex;gap:8px;padding:10px;border-top:1px solid var(--glass-border);">
+          <button id="micBtn" onclick="toggleVoiceInput()" title="Speak" style="width:auto;padding:0 12px;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:10px;cursor:pointer;font-size:16px;color:var(--text-primary);">🎤</button>
+          <input id="aiChatInput" type="text" data-t-ph="aiChatPlaceholder" style="flex:1;margin:0;" onkeydown="if(event.key==='Enter') sendAiChatMessage()">
+          <button class="btn small" onclick="sendAiChatMessage()" style="width:auto;padding:0 16px;">➤</button>
+        </div>
+      </div>
+
+      <h3 style="margin-top:26px;">✨ Aura AI</h3>
+      <div class="glass" style="padding:16px;text-align:center;">
+        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Apna alag AI assistant, naye tab mein khulega</div>
+        <button class="btn small" style="width:auto;padding:0 20px;" onclick="window.open('aura.html','_blank')">✨ Open Aura</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<nav class="bottom" id="bottomNav" style="display:none;">
+  <button class="active" data-tab="today" onclick="switchTab('today')"><span class="icon">📅</span><span data-t="navToday">Today</span></button>
+  <button data-tab="calendar" onclick="switchTab('calendar')"><span class="icon">🗓️</span><span data-t="navCalendar">Calendar</span></button>
+  <button data-tab="analytics" onclick="switchTab('analytics')"><span class="icon">📊</span><span data-t="navAnalytics">Analytics</span></button>
+  <button data-tab="goals" onclick="switchTab('goals')"><span class="icon">🚩</span><span data-t="navGoals">Goals</span></button>
+  <button data-tab="chat" onclick="switchTab('chat')"><span class="icon">💬</span><span data-t="navChat">Chat</span></button>
+</nav>
+
+<!-- FOCUS MODE -->
+<div id="focusOverlay">
+  <button class="close-focus" onclick="closeFocus()">✕</button>
+  <div id="focusLockBadge" onclick="showStartWorkingPopup()" style="display:none;cursor:pointer;background:rgba(240,193,75,0.15);color:var(--gold);
+    border:1px solid rgba(240,193,75,0.4);border-radius:20px;padding:5px 14px;font-size:12px;
+    font-weight:700;margin-bottom:10px;">
+    🔒 <span data-t="focusLockOn">Focus Lock ON</span> — <span data-t="distractionsLabel">Distractions</span>: <span id="distractionCount">0</span>
+  </div>
+  <div id="focusTitle" style="font-size:22px;font-weight:700;text-align:center;"></div>
+  <div id="pomodoroToggleRow" style="margin-top:10px;">
+    <button class="btn small secondary" id="pomodoroToggleBtn" onclick="togglePomodoroMode()" data-t="startPomodoro">🍅 Start Pomodoro (25/5)</button>
+    <div id="pomodoroPhaseLabel" style="display:none;text-align:center;font-size:12px;color:var(--gold);font-weight:700;margin-top:6px;"></div>
+  </div>
+  <div class="ring" style="margin-top:24px;">
+    <svg width="180" height="180">
+      <circle cx="90" cy="90" r="78" stroke="var(--glass-fill)" stroke-width="12" fill="none"/>
+      <circle id="focusRing" cx="90" cy="90" r="78" stroke="url(#grad1)" stroke-width="12" fill="none"
+        stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490"/>
+    </svg>
+    <div class="ring-center"><span id="focusTimer">25:00</span></div>
+  </div>
+  <div class="quote" id="focusQuote"></div>
+  <div class="focus-controls">
+    <button class="round-btn" id="pauseBtn" onclick="togglePause()">⏸</button>
+    <button class="round-btn outline" onclick="completeFocusTask()">✓</button>
+  </div>
+</div>
+
+<!-- TASK ADD/EDIT MODAL -->
+<div class="modal-overlay" id="taskModalOverlay">
+  <div class="modal-sheet">
+    <h3 id="taskModalTitle">Add Task</h3>
+    <input type="hidden" id="taskModalId">
+    <input type="hidden" id="taskModalDay">
+    <label data-t="titleLabel">Title</label>
+    <input id="taskModalTitleInput" type="text" placeholder="e.g. Study Maths">
+    <label data-t="categoryLabel">Category</label>
+    <select id="taskModalCategory" onchange="toggleBreakActivityField()">
+      <option value="study" data-t="catStudy">Study</option>
+      <option value="work" data-t="catWork">Work</option>
+      <option value="exercise" data-t="catExercise">Exercise</option>
+      <option value="meal" data-t="catMeal">Meal</option>
+      <option value="travel" data-t="catTravel">Travel</option>
+      <option value="break" data-t="catBreak">Break</option>
+      <option value="personal" data-t="catPersonal">Personal</option>
+      <option value="goal" data-t="catGoal">Goal</option>
+      <option value="other" data-t="catOther">Other</option>
+    </select>
+    <div id="breakActivityWrap" style="display:none;">
+      <label data-t="breakActivityLabel">What will you do?</label>
+      <select id="taskModalBreakActivity">
+        <option value="instagram" data-t="brkInstagram">📱 Instagram</option>
+        <option value="reels" data-t="brkReels">🎬 Reels / Shorts</option>
+        <option value="cricket" data-t="brkCricket">🏏 Cricket</option>
+        <option value="indoor" data-t="brkIndoor">🎲 Indoor Games</option>
+        <option value="outdoor" data-t="brkOutdoor">⚽ Outdoor Games</option>
+        <option value="other_games" data-t="brkOtherGames">🎮 Other Games</option>
+        <option value="rest" data-t="brkRest">🛋️ Just Resting</option>
+        <option value="other" data-t="brkOther">✨ Other</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <div>
+        <label data-t="startTimeLabel">Start Time</label>
+        <input id="taskModalStart" type="time">
+      </div>
+      <div>
+        <label data-t="endTimeLabel">End Time</label>
+        <input id="taskModalEnd" type="time">
+      </div>
+    </div>
+    <label data-t="priorityLabel">Priority</label>
+    <select id="taskModalPriority">
+      <option value="low" data-t="priLow">Low</option>
+      <option value="medium" selected data-t="priMedium">Medium</option>
+      <option value="high" data-t="priHigh">High</option>
+      <option value="critical" data-t="priCritical">Critical</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeTaskModal()" data-t="cancelBtn">Cancel</button>
+      <button class="btn" onclick="saveTaskModal()" data-t="saveBtn">Save</button>
+    </div>
+    <button class="btn secondary" id="taskModalDeleteBtn" style="margin-top:10px;display:none;color:var(--danger);" onclick="deleteTaskFromModal()" data-t="deleteTaskBtn">🗑 Delete Task</button>
+  </div>
+</div>
+
+<!-- PROFILE / SETTINGS / PERMISSIONS MODAL -->
+<div class="modal-overlay" id="profileModalOverlay">
+  <div class="modal-sheet">
+    <div class="section-head">
+      <h3>👤 Profile</h3>
+      <button class="icon-btn" onclick="closeProfileModal()">✕</button>
+    </div>
+
+    <div class="profile-photo-wrap">
+      <div class="profile-photo" id="profPhotoPreview">🙂</div>
+      <input type="file" id="profPhotoInput" accept="image/*" style="display:none;" onchange="onProfilePhotoSelected(event)">
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn small secondary" onclick="document.getElementById('profPhotoInput').click()" data-t="changePhotoBtn">📷 Change Photo</button>
+        <button class="btn small secondary" id="profPhotoRemoveBtn" style="display:none;color:var(--danger);" onclick="removeProfilePhoto()" data-t="removePhotoBtn">Remove</button>
+      </div>
+    </div>
+
+    <label data-t="fullNameLabel">Full Name</label>
+    <input id="profName" type="text">
+    <label data-t="gmailLabel">Gmail</label>
+    <input id="profEmail" type="email" disabled style="opacity:0.7;">
+    <label data-t="ageLabel">Age</label>
+    <input id="profAge" type="number">
+    <label data-t="userTypeLabel">You are a</label>
+    <div class="chips" id="profUserTypeChips"></div>
+
+    <div class="modal-row">
+      <div>
+        <label data-t="wakeLabel">Wake-up</label>
+        <input id="profWake" type="time">
+      </div>
+      <div>
+        <label data-t="sleepLabel">Sleep</label>
+        <input id="profSleep" type="time">
+      </div>
+    </div>
+    <div class="modal-row">
+      <div>
+        <label data-t="dutyStartLabel">Duty Start</label>
+        <input id="profDutyStart" type="time">
+      </div>
+      <div>
+        <label data-t="dutyEndLabel">Duty End</label>
+        <input id="profDutyEnd" type="time">
+      </div>
+    </div>
+    <label data-t="mainGoalLabel">Main Goal</label>
+    <input id="profMainGoal" type="text">
+    <button class="btn" style="margin-top:8px;" onclick="saveProfileModal()" data-t="saveProfileBtn">Save Profile</button>
+
+    <hr style="border:none;border-top:1px solid var(--glass-border);margin:18px 0;">
+
+    <h3 data-t="settingsTitle">⚙️ Settings</h3>
+    <div class="glass alert-toggle-row">
+      <div>
+        <div style="font-weight:600;font-size:14px;" data-t="languageLabel">Language</div>
+        <div class="status" id="profLangStatus">English</div>
+      </div>
+      <button class="btn small" onclick="toggleLang();renderProfileModal();" data-t="switchBtn">Switch</button>
+    </div>
+    <div class="glass alert-toggle-row">
+      <div>
+        <div style="font-weight:600;font-size:14px;" data-t="themeLabel">☀️ Theme</div>
+        <div class="status" id="themeStatus">Dark</div>
+      </div>
+      <button class="btn small" id="themeToggleBtn" onclick="toggleTheme()">Light</button>
+    </div>
+    <div class="glass alert-toggle-row">
+      <div>
+        <div style="font-weight:600;font-size:14px;" data-t="taskAlertsLabel">Task Alerts</div>
+        <div class="status" id="profAlertStatus">Off</div>
+      </div>
+      <button class="btn small" id="profAlertBtn" onclick="toggleAlertsSetting()">Enable</button>
+    </div>
+    <div class="glass alert-toggle-row">
+      <div>
+        <div style="font-weight:600;font-size:14px;" data-t="focusLockLabel">🔒 Focus Lock (Study/Work)</div>
+        <div class="status" id="focusLockStatus">Off</div>
+      </div>
+      <button class="btn small" id="focusLockBtn" onclick="toggleFocusLockSetting()">Enable</button>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--glass-border);margin:18px 0;">
+
+    <h3>⏳ Daily App Time Limit</h3>
+    <div class="glass" style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
+      <div style="font-size:11px;margin-bottom:8px;">Set how long you can use Schedule Lab per day. Once time is up, the app locks until midnight — like a screen-time limit.</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span id="timeLimitUsageText" style="font-weight:600;color:var(--text-primary);">Today: 0 / 0 min</span>
+      </div>
+      <div style="height:8px;border-radius:6px;background:var(--glass-fill);overflow:hidden;margin-bottom:10px;">
+        <div id="timeLimitBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--neon-blue),var(--gold));transition:width .3s;"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="timeLimitInput" type="number" min="0" placeholder="e.g. 60" style="flex:1;margin:0;" value="">
+        <button class="btn small secondary" style="width:auto;padding:0 14px;margin:0;" onclick="saveTimeLimit()">Save</button>
+      </div>
+      <div style="font-size:11px;margin-top:6px;">Minutes per day. Set to 0 or leave blank to disable the limit.</div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--glass-border);margin:18px 0;">
+
+    <h3 data-t="permissionsTitle">🔒 Permissions</h3>
+    <div class="glass" style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
+      <div><strong style="color:var(--text-primary);" data-t="notifLabel">Notifications:</strong> <span id="permNotifStatus">not asked</span></div>
+      <div style="font-size:11px;margin:2px 0 6px;">Covers task alerts & scheduled alarm reminders.</div>
+      <button class="btn small secondary" onclick="requestNotifPermission()" data-t="requestPermBtn">Request Notification Permission</button>
+      <hr style="border:none;border-top:1px solid var(--glass-border);margin:12px 0;">
+      <div><strong style="color:var(--text-primary);">Microphone:</strong> <span id="permMicStatus">not asked</span></div>
+      <div style="font-size:11px;margin:2px 0 6px;">Used for the 🎤 voice input button in AI Chat.</div>
+      <button class="btn small secondary" style="margin-top:0;" onclick="requestMicPermission()">Request Microphone Permission</button>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--glass-border);margin:18px 0;">
+
+    <h3 id="whatsNewHeading">🆕 What's New — <span id="appVersionLabel">v1.9</span></h3>
+    <div class="glass" id="changelogBox" style="font-size:12.5px;color:var(--text-secondary);line-height:1.7;max-height:200px;overflow-y:auto;"></div>
+
+    <hr style="border:none;border-top:1px solid var(--glass-border);margin:18px 0;">
+
+    <h3 data-t="backupTitle">💾 Backup (Delete se pehle zaroor karo)</h3>
+    <div class="glass" style="font-size:13px;color:var(--text-secondary);line-height:1.5;" data-t="backupDesc">
+      App delete karne se pehle backup export kar lo. Dobara install karne ke baad, isi file ko import karke apna profile, schedule aur goals wapas la sakte ho.
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button class="btn small secondary" onclick="exportBackup()" data-t="exportBtn">📤 Export Backup</button>
+      <button class="btn small secondary" onclick="document.getElementById('importBackupInput').click()" data-t="importBtn">📥 Import Backup</button>
+    </div>
+    <input type="file" id="importBackupInput" accept="application/json" style="display:none;" onchange="importBackup(event)">
+
+    <hr style="border:none;border-top:1px solid var(--glass-border);margin:18px 0;">
+
+    <hr style="border:none;border-top:1px solid var(--glass-border);margin:18px 0;">
+
+    <h3 data-t="aboutTitle">ℹ️ About</h3>
+    <div class="glass" id="aboutText" style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;max-height:180px;overflow-y:auto;white-space:pre-wrap;"></div>
+    <button class="btn small secondary" style="margin-top:8px;" onclick="copyAboutText()" id="copyAboutBtn" data-t="copyBtn">📋 Copy Description</button>
+
+    <hr style="border:none;border-top:1px solid var(--glass-border);margin:18px 0;">
+
+    <button class="btn secondary" style="color:var(--danger);" onclick="logoutUser()" data-t="logoutBtn">🚪 Logout (Reset App)</button>
+  </div>
+</div>
+
+<!-- PREMIUM UPGRADE MODAL -->
+<div class="modal-overlay" id="premiumModalOverlay">
+  <div class="modal-sheet" style="text-align:center;">
+    <div style="font-size:44px;margin-bottom:6px;">⭐</div>
+    <h3 data-t="premiumModalTitle">Unlock Premium</h3>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;" data-t="premiumModalDesc">Get access to Focus Lock, AI Chat Assistant, and Light/Dark Themes.</p>
+    <div class="glass" style="text-align:left;padding:14px 16px;margin-bottom:14px;">
+      <div style="margin-bottom:8px;">🔒 <span data-t="premiumFeature1">Focus Lock mode (block distractions)</span></div>
+      <div style="margin-bottom:8px;">🤖 <span data-t="premiumFeature2">AI Motivation Chat Assistant</span></div>
+      <div>☀️ <span data-t="premiumFeature3">Light / Dark theme switch</span></div>
+    </div>
+    <div id="premiumPlanList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
+    <button class="btn secondary" style="width:100%;margin-top:4px;" onclick="closePremiumModal()" data-t="maybeLaterBtn">Maybe Later</button>
+    <div style="font-size:10.5px;color:var(--text-secondary);margin-top:10px;" data-t="premiumTestNote">(Secure payment via Razorpay)</div>
+  </div>
+</div>
+
+<script>
+/* ---------------- STATE & STORAGE ---------------- */
+const STORAGE_KEY = 'schedule_lab_state_v1';
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+  profile: null,
+  tasks: [],
+  goals: [],
+  lang: 'en',
+  selectedDay: todayISO(),
+  xp: 0,
+  streak: 0,
+  lastStreakDay: null,
+  badges: []
+};
+if(state.xp === undefined) state.xp = 0;
+if(state.streak === undefined) state.streak = 0;
+if(state.lastStreakDay === undefined) state.lastStreakDay = null;
+if(state.badges === undefined) state.badges = [];
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); scheduleNativeAlarms(); }
+function todayISO(d){ const dt=d?new Date(d):new Date(); return dt.toISOString().slice(0,10); }
+function uid(){ return 'id-'+Date.now()+'-'+Math.random().toString(36).slice(2,7); }
+
+/* ---------------- TRANSLATIONS ---------------- */
+const STRINGS = {
+  appTitle:{en:'Schedule Lab',hi:'शेड्यूल लैब'},
+  onboardingWelcome:{en:"Let's build your perfect day",hi:'आइए आपका बेहतरीन दिन बनाते हैं'},
+  fullName:{en:'Full Name',hi:'पूरा नाम'},
+  age:{en:'Age',hi:'उम्र'},
+  userType:{en:'You are a',hi:'आप हैं'},
+  wakeUpTime:{en:'Wake-up Time',hi:'जागने का समय'},
+  sleepTime:{en:'Sleep Time',hi:'सोने का समय'},
+  dutyTime:{en:'School / College / Office',hi:'स्कूल / कॉलेज / ऑफिस'},
+  travelTime:{en:'Travel Time (minutes)',hi:'यात्रा का समय (मिनट)'},
+  freeTime:{en:'Daily Free Time (minutes)',hi:'रोज़ का खाली समय (मिनट)'},
+  mainGoal:{en:'Main Goal',hi:'मुख्य लक्ष्य'},
+  secondaryGoals:{en:'Secondary Goals (comma separated)',hi:'अन्य लक्ष्य (कॉमा से अलग करें)'},
+  continueBtn:{en:'Continue',hi:'आगे बढ़ें'},
+  today:{en:"Today's Schedule",hi:'आज का शेड्यूल'},
+  calendar:{en:'Calendar',hi:'कैलेंडर'},
+  analytics:{en:'Analytics',hi:'विश्लेषण'},
+  goals:{en:'Goals',hi:'लक्ष्य'},
+  chatTitle:{en:'Reminders',hi:'रिमाइंडर'},
+  alertsLabel:{en:'Task Alerts',hi:'टास्क अलर्ट'},
+  alertsOff:{en:'Off — tap to enable',hi:'बंद है — चालू करने के लिए टैप करें'},
+  alertsOn:{en:'On — you\'ll be notified',hi:'चालू है — आपको सूचना मिलेगी'},
+  enableBtn:{en:'Enable',hi:'चालू करें'},
+
+  navToday:{en:'Today',hi:'आज'},
+  navCalendar:{en:'Calendar',hi:'कैलेंडर'},
+  navAnalytics:{en:'Analytics',hi:'विश्लेषण'},
+  navGoals:{en:'Goals',hi:'लक्ष्य'},
+  navChat:{en:'Chat',hi:'चैट'},
+
+  loginTitle:{en:'Welcome to Schedule Lab',hi:'शेड्यूल लैब में स्वागत है'},
+  loginSubtitle:{en:'Enter your name and Gmail to continue',hi:'आगे बढ़ने के लिए नाम और Gmail डालें'},
+  loginNameLabel:{en:'Name',hi:'नाम'},
+  loginEmailLabel:{en:'Gmail',hi:'जीमेल'},
+  loginContinue:{en:'Continue →',hi:'आगे बढ़ें →'},
+  orDivider:{en:'or',hi:'या'},
+  loginPasswordLabel:{en:'Password',hi:'पासवर्ड'},
+  loginPasswordNote:{en:'Note: this is just a local lock for this app — it does NOT verify your real Gmail password with Google.',hi:'ध्यान दें: यह सिर्फ इस ऐप के लिए एक लोकल लॉक है — यह आपके असली Gmail पासवर्ड को Google से वेरीफाई नहीं करता।'},
+
+  otpTitle:{en:'Verify your email',hi:'अपनी ईमेल वेरीफाई करें'},
+  otpSubtitle:{en:'We sent a 6-digit code to',hi:'हमने 6 अंकों का कोड भेजा है'},
+  otpLabel:{en:'Enter code',hi:'कोड डालें'},
+  otpVerify:{en:'Verify →',hi:'वेरीफाई करें →'},
+  otpResend:{en:'Resend code',hi:'कोड दोबारा भेजें'},
+  otpSending:{en:'Sending code...',hi:'कोड भेजा जा रहा है...'},
+  otpSent:{en:'Code sent! Check your inbox.',hi:'कोड भेज दिया गया! अपना इनबॉक्स देखें।'},
+  otpWrong:{en:'Wrong code, try again.',hi:'गलत कोड, दोबारा कोशिश करें।'},
+  otpBack:{en:'← Back',hi:'← वापस'},
+
+  addTaskTitle:{en:'Add Task',hi:'टास्क जोड़ें'},
+  editTaskTitle:{en:'Edit Task',hi:'टास्क बदलें'},
+  titleLabel:{en:'Title',hi:'शीर्षक'},
+  categoryLabel:{en:'Category',hi:'श्रेणी'},
+  startTimeLabel:{en:'Start Time',hi:'शुरू होने का समय'},
+  endTimeLabel:{en:'End Time',hi:'खत्म होने का समय'},
+  priorityLabel:{en:'Priority',hi:'प्राथमिकता'},
+  cancelBtn:{en:'Cancel',hi:'रद्द करें'},
+  saveBtn:{en:'Save',hi:'सेव करें'},
+  deleteTaskBtn:{en:'🗑 Delete Task',hi:'🗑 टास्क हटाएं'},
+  addTaskFab:{en:'➕ Add Your Own Task',hi:'➕ अपना टास्क जोड़ें'},
+  aiSuggestBtn:{en:'✨ Or get AI Suggestion',hi:'✨ या AI सुझाव लें'},
+  noTasksToday:{en:'No task for today.',hi:'आज के लिए कोई टास्क नहीं है।'},
+
+  catStudy:{en:'Study',hi:'पढ़ाई'},
+  catWork:{en:'Work',hi:'काम'},
+  catExercise:{en:'Exercise',hi:'व्यायाम'},
+  catMeal:{en:'Meal',hi:'खाना'},
+  catTravel:{en:'Travel',hi:'यात्रा'},
+  catBreak:{en:'Break',hi:'ब्रेक'},
+  catPersonal:{en:'Personal',hi:'व्यक्तिगत'},
+  catGoal:{en:'Goal',hi:'लक्ष्य'},
+  catOther:{en:'Other',hi:'अन्य'},
+  priLow:{en:'Low',hi:'कम'},
+  priMedium:{en:'Medium',hi:'मध्यम'},
+  priHigh:{en:'High',hi:'ज़्यादा'},
+  priCritical:{en:'Critical',hi:'बहुत ज़रूरी'},
+
+  startBtn:{en:'Start',hi:'शुरू करें'},
+  completeBtn:{en:'Complete',hi:'पूरा करें'},
+  skipBtn:{en:'Skip',hi:'छोड़ें'},
+  completedLabel:{en:'✓ Completed',hi:'✓ पूरा हुआ'},
+
+  profileTitle:{en:'👤 Profile',hi:'👤 प्रोफ़ाइल'},
+  fullNameLabel:{en:'Full Name',hi:'पूरा नाम'},
+  gmailLabel:{en:'Gmail',hi:'जीमेल'},
+  ageLabel:{en:'Age',hi:'उम्र'},
+  userTypeLabel:{en:'You are a',hi:'आप हैं'},
+  wakeLabel:{en:'Wake-up',hi:'जागने का समय'},
+  sleepLabel:{en:'Sleep',hi:'सोने का समय'},
+  dutyStartLabel:{en:'Duty Start',hi:'काम शुरू'},
+  dutyEndLabel:{en:'Duty End',hi:'काम खत्म'},
+  mainGoalLabel:{en:'Main Goal',hi:'मुख्य लक्ष्य'},
+  saveProfileBtn:{en:'Save Profile',hi:'प्रोफ़ाइल सेव करें'},
+  changePhotoBtn:{en:'📷 Change Photo',hi:'📷 फ़ोटो बदलें'},
+  removePhotoBtn:{en:'Remove',hi:'हटाएं'},
+
+  settingsTitle:{en:'⚙️ Settings',hi:'⚙️ सेटिंग्स'},
+  languageLabel:{en:'Language',hi:'भाषा'},
+  switchBtn:{en:'Switch',hi:'बदलें'},
+  taskAlertsLabel:{en:'Task Alerts',hi:'टास्क अलर्ट'},
+
+  permissionsTitle:{en:'🔒 Permissions',hi:'🔒 अनुमतियाँ'},
+  notifLabel:{en:'Notifications:',hi:'सूचनाएं:'},
+  requestPermBtn:{en:'Request Notification Permission',hi:'सूचना अनुमति मांगें'},
+
+  backupTitle:{en:'💾 Backup (do this before deleting)',hi:'💾 बैकअप (डिलीट करने से पहले करें)'},
+  backupDesc:{en:'Export a backup before deleting the app. After reinstalling, import the same file to get your profile, schedule and goals back.',hi:'ऐप डिलीट करने से पहले बैकअप एक्सपोर्ट कर लें। दोबारा इंस्टॉल करने के बाद, वही फ़ाइल इम्पोर्ट करके अपनी प्रोफ़ाइल, शेड्यूल और लक्ष्य वापस पा सकते हैं।'},
+  exportBtn:{en:'📤 Export Backup',hi:'📤 बैकअप एक्सपोर्ट करें'},
+  importBtn:{en:'📥 Import Backup',hi:'📥 बैकअप इम्पोर्ट करें'},
+  logoutBtn:{en:'🚪 Logout (Reset App)',hi:'🚪 लॉगआउट (ऐप रीसेट करें)'},
+
+  reminderBotName:{en:'Reminder Bot',hi:'रिमाइंडर बॉट'},
+  nowTag:{en:'NOW',hi:'अभी'},
+  noRemindersYet:{en:"No reminders yet — generate today's schedule first.",hi:'अभी कोई रिमाइंडर नहीं है — पहले आज का शेड्यूल बनाएं।'},
+
+  breakActivityLabel:{en:'What will you do?',hi:'क्या करोगे?'},
+  brkInstagram:{en:'📱 Instagram',hi:'📱 इंस्टाग्राम'},
+  brkReels:{en:'🎬 Reels / Shorts',hi:'🎬 रील्स / शॉर्ट्स'},
+  brkCricket:{en:'🏏 Cricket',hi:'🏏 क्रिकेट'},
+  brkIndoor:{en:'🎲 Indoor Games',hi:'🎲 इनडोर गेम्स'},
+  brkOutdoor:{en:'⚽ Outdoor Games',hi:'⚽ आउटडोर गेम्स'},
+  brkOtherGames:{en:'🎮 Other Games',hi:'🎮 अन्य गेम्स'},
+  brkRest:{en:'🛋️ Just Resting',hi:'🛋️ आराम'},
+  brkOther:{en:'✨ Other',hi:'✨ अन्य'},
+  activityLogTitle:{en:'📋 Break Activity Log',hi:'📋 ब्रेक एक्टिविटी लॉग'},
+  noActivityLog:{en:'No completed breaks yet.',hi:'अभी तक कोई पूरा किया गया ब्रेक नहीं है।'},
+
+  aboutTitle:{en:'ℹ️ About',hi:'ℹ️ ऐप के बारे में'},
+  copyBtn:{en:'📋 Copy Description',hi:'📋 विवरण कॉपी करें'},
+  copiedBtn:{en:'✅ Copied!',hi:'✅ कॉपी हो गया!'},
+  focusLockLabel:{en:'🔒 Focus Lock (Study/Work)',hi:'🔒 फोकस लॉक (पढ़ाई/काम)'},
+  focusLockOn:{en:'Focus Lock ON',hi:'फोकस लॉक चालू'},
+  distractionsLabel:{en:'Distractions',hi:'डिस्ट्रैक्शन'},
+  offlineMsg:{en:'No internet connection... waiting to reconnect.',hi:'इंटरनेट कनेक्शन नहीं है... दोबारा जुड़ने का इंतज़ार कर रहे हैं।'},
+  monthlyTitle:{en:'📆 Monthly Summary (Last 30 Days)',hi:'📆 मासिक सारांश (पिछले 30 दिन)'},
+  monthCompletedLabel:{en:'Completed',hi:'पूरे हुए'},
+  monthHoursLabel:{en:'Total Hours',hi:'कुल घंटे'},
+  monthAvgLabel:{en:'Avg / Day',hi:'औसत / दिन'},
+  gamificationTitle:{en:'🏆 Your Progress',hi:'🏆 आपकी प्रगति'},
+  levelLabel:{en:'Level',hi:'लेवल'},
+  dayStreakLabel:{en:'day streak',hi:'दिन की स्ट्रीक'},
+  studyHoursTitle:{en:'📈 Study Hours (Last 7 Days)',hi:'📈 पढ़ाई के घंटे (पिछले 7 दिन)'},
+  startPomodoro:{en:'🍅 Start Pomodoro (25/5)',hi:'🍅 पोमोडोरो शुरू करें (25/5)'},
+  aiAssistantTitle:{en:'🤖 AI Motivation Assistant',hi:'🤖 AI मोटिवेशन असिस्टेंट'},
+  aiChatPlaceholder:{en:'Type how you feel...',hi:'aap kaisa feel kar rahe ho likho...'},
+  themeLabel:{en:'☀️ Theme',hi:'☀️ थीम'},
+  whatsNewTitle:{en:"🆕 What's New —",hi:'🆕 नया क्या है —'},
+  premiumModalTitle:{en:'Unlock Premium',hi:'प्रीमियम अनलॉक करें'},
+  premiumModalDesc:{en:'Get access to Focus Lock, AI Chat Assistant, and Light/Dark Themes.',hi:'फोकस लॉक, AI चैट असिस्टेंट, और लाइट/डार्क थीम पाएं।'},
+  premiumFeature1:{en:'Focus Lock mode (block distractions)',hi:'फोकस लॉक मोड (डिस्ट्रैक्शन ब्लॉक करें)'},
+  premiumFeature2:{en:'AI Motivation Chat Assistant',hi:'AI मोटिवेशन चैट असिस्टेंट'},
+  premiumFeature3:{en:'Light / Dark theme switch',hi:'लाइट / डार्क थीम स्विच'},
+  subscribeBtn:{en:'⭐ Subscribe — ₹5/month',hi:'⭐ सब्सक्राइब करें — ₹5/महीना'},
+  maybeLaterBtn:{en:'Maybe Later',hi:'बाद में'},
+  premiumTestNote:{en:'(Secure payment via Razorpay)',hi:'(Razorpay se सुरक्षित पेमेंट)'},
+  aboutBody:{
+    en:`Schedule Lab — Your Whole Day, Your Control
+
+Build your own daily timetable — study, work, breaks, goals — all planned and tracked your way.
+
+Schedule Lab is a personal time-management app that lets you design your own schedule every single day — no fixed or auto-forced timetable. Whether you're a student, employee, business owner, or anything else, the app adapts to your lifestyle.
+
+Key Features:
+📅 Custom Daily Schedule — every day is different, fully in your control. Add, edit, or delete tasks anytime.
+🗓️ Calendar View — plan across a 7-day view, jump to any day and build it your way
+☕ Break Activities — track what you actually do on breaks: Instagram, Reels, Cricket, Indoor/Outdoor Games
+📊 Analytics — completion rate, focus hours, productivity score, and a break activity log
+🚩 Goals — set daily, weekly, monthly, and yearly goals
+💬 Smart Reminders — chat-style notifications when a task's time arrives
+👤 Profile & Login — personal profile with name, Gmail, and photo
+💾 Backup/Restore — export/import your data to stay safe across devices
+🌐 Multi-language — Hindi/English toggle plus Google Translate for any language
+⭐ Premium Look — modern glassmorphism dark UI with gold accents
+📱 Installable App (PWA) — install to your home screen like a real app, works offline too`,
+    hi:`शेड्यूल लैब — आपका पूरा दिन, आपके नियंत्रण में
+
+अपना खुद का डेली टाइमटेबल बनाएं — पढ़ाई, काम, ब्रेक, लक्ष्य — सब कुछ अपने तरीके से प्लान और ट्रैक करें।
+
+शेड्यूल लैब एक पर्सनल टाइम-मैनेजमेंट ऐप है जो आपको हर दिन अपना शेड्यूल खुद डिज़ाइन करने देता है — कोई फिक्स्ड या ऑटो-फोर्स्ड टाइमटेबल नहीं। चाहे आप स्टूडेंट हों, एम्प्लॉई हों, बिज़नेस करते हों या कुछ और — ऐप आपकी लाइफस्टाइल के हिसाब से ढल जाता है।
+
+मुख्य फीचर्स:
+📅 कस्टम डेली शेड्यूल — हर दिन अलग, पूरी तरह आपके नियंत्रण में। कभी भी टास्क जोड़ें, बदलें या हटाएं।
+🗓️ कैलेंडर व्यू — 7 दिन का प्लानर, किसी भी दिन पर जाकर अपना शेड्यूल बनाएं
+☕ ब्रेक एक्टिविटीज़ — इंस्टाग्राम, रील्स, क्रिकेट, इनडोर/आउटडोर गेम्स — अपने ब्रेक का टाइप भी ट्रैक करें
+📊 एनालिटिक्स — कम्पलीशन रेट, फोकस आवर्स, प्रोडक्टिविटी स्कोर, और ब्रेक एक्टिविटी लॉग
+🚩 गोल्स — डेली, वीकली, मंथली और ईयरली लक्ष्य सेट करें
+💬 स्मार्ट रिमाइंडर्स — टास्क का समय आने पर चैट-स्टाइल नोटिफिकेशन
+👤 प्रोफ़ाइल और लॉगिन — नाम, जीमेल और फोटो के साथ पर्सनल प्रोफ़ाइल
+💾 बैकअप/रीस्टोर — डिवाइस बदलने पर भी अपना डेटा सेफ रखने के लिए एक्सपोर्ट-इम्पोर्ट करें
+🌐 मल्टी-लैंग्वेज — हिंदी/इंग्लिश टॉगल और किसी भी भाषा के लिए Google Translate
+⭐ प्रीमियम लुक — मॉडर्न ग्लासमॉर्फिज़्म डार्क UI, गोल्ड एक्सेंट्स के साथ
+📱 इंस्टॉलेबल ऐप (PWA) — असली ऐप की तरह होम स्क्रीन पर इंस्टॉल करें, ऑफलाइन भी चलता है`
+  }
+};
+function t(key){ return (STRINGS[key] && STRINGS[key][state.lang]) || key; }
+function applyTranslations(){
+  document.querySelectorAll('[data-t]').forEach(el=>{ el.textContent = t(el.getAttribute('data-t')); });
+  document.querySelectorAll('[data-t-ph]').forEach(el=>{ el.placeholder = t(el.getAttribute('data-t-ph')); });
+}
+function toggleLang(){ state.lang = state.lang==='en' ? 'hi' : 'en'; save(); applyTranslations(); renderUserTypeChips(); }
+
+/* ---------------- ONBOARDING ---------------- */
+const USER_TYPES = [
+  {key:'student',en:'Student',hi:'छात्र'},
+  {key:'employee',en:'Employee',hi:'कर्मचारी'},
+  {key:'business',en:'Business',hi:'व्यवसाय'},
+  {key:'other',en:'Other',hi:'अन्य'}
+];
+let selectedUserType = 'student';
+let obStep = 1;
+const OB_STEPS = 4;
+
+function renderUserTypeChips(){
+  const wrap = document.getElementById('userTypeChips');
+  wrap.innerHTML = '';
+  USER_TYPES.forEach(u=>{
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (u.key===selectedUserType ? ' active' : '');
+    chip.textContent = u[state.lang];
+    chip.onclick = ()=>{ selectedUserType = u.key; renderUserTypeChips(); };
+    wrap.appendChild(chip);
+  });
+}
+
+function obNext(){
+  if(obStep < OB_STEPS){
+    document.querySelector(`.step[data-step="${obStep}"]`).classList.remove('active');
+    obStep++;
+    document.querySelector(`.step[data-step="${obStep}"]`).classList.add('active');
+    document.getElementById('obProgress').style.width = (obStep/OB_STEPS*100)+'%';
+  } else {
+    finishOnboarding();
+  }
+}
+
+function finishOnboarding(){
+  const profile = {
+    fullName: document.getElementById('fullName').value || 'User',
+    age: parseInt(document.getElementById('age').value) || 18,
+    userType: selectedUserType,
+    wakeUpTime: document.getElementById('wakeUpTime').value,
+    sleepTime: document.getElementById('sleepTime').value,
+    dutyStart: document.getElementById('dutyStart').value,
+    dutyEnd: document.getElementById('dutyEnd').value,
+    travelMin: parseInt(document.getElementById('travelTime').value) || 0,
+    freeMin: parseInt(document.getElementById('freeTime').value) || 60,
+    mainGoal: document.getElementById('mainGoal').value,
+    secondaryGoals: document.getElementById('secondaryGoals').value.split(',').map(s=>s.trim()).filter(Boolean)
+  };
+  state.profile = profile;
+  save();
+  showMainApp();
+}
+
+/* ---------------- AI SCHEDULE GENERATOR ---------------- */
+function toMinutes(hhmm){ const [h,m]=hhmm.split(':').map(Number); return h*60+m; }
+function fromMinutes(day, min){
+  min = ((min % 1440)+1440)%1440;
+  const h = Math.floor(min/60), m = min%60;
+  return `${day}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+function generateSchedule(day){
+  const p = state.profile;
+  if(!p) return;
+  // remove old AI tasks for this day (keep manually completed history intact by regenerating fresh)
+  state.tasks = state.tasks.filter(tk => tk.day !== day);
+
+  const anchors = [];
+  const wake = toMinutes(p.wakeUpTime), sleep = toMinutes(p.sleepTime);
+  const dutyStart = toMinutes(p.dutyStart), dutyEnd = toMinutes(p.dutyEnd);
+
+  anchors.push(mkTask('Morning Routine','personal',wake, wake+45,'medium'));
+  if(p.travelMin>0) anchors.push(mkTask('Travel','travel', dutyStart-p.travelMin, dutyStart,'medium'));
+  anchors.push(mkTask('School / Work','work', dutyStart, dutyEnd,'medium'));
+  anchors.push(mkTask('Lunch','meal', 13*60, 13*60+30,'low'));
+  anchors.push(mkTask('Dinner','meal', 20*60+30, 21*60,'low'));
+  const exStart = dutyEnd+60, exEnd = exStart+45;
+  if(exEnd < sleep-30) anchors.push(mkTask('Exercise','exercise', exStart, exEnd,'medium'));
+  anchors.push(mkTask('Wind Down','personal', sleep-30, sleep,'low'));
+
+  anchors.sort((a,b)=>a.startMin-b.startMin);
+
+  // free slots between anchors within the day (0-1440)
+  const slots = [];
+  let cursor = 0;
+  anchors.forEach(a=>{
+    if(a.startMin > cursor) slots.push([cursor, a.startMin]);
+    cursor = Math.max(cursor, a.endMin);
+  });
+  if(cursor < 1440) slots.push([cursor,1440]);
+
+  // candidate tasks from active goals, priority sorted
+  const activeGoals = state.goals.filter(g=>!g.completed);
+  const candidates = activeGoals.map(g=> mkTask(g.title,'goal', 0,45, g.priority||'medium', g.id));
+
+  const generated = [...anchors];
+  slots.forEach(([s,e])=>{
+    let c = s;
+    while(c < e && candidates.length){
+      const task = candidates.shift();
+      const dur = 45;
+      if(c+dur > e) { candidates.unshift(task); break; }
+      task.startMin = c; task.endMin = c+dur;
+      generated.push(task);
+      c += dur+5;
+    }
+    if(c < e && (e-c) >= 15){
+      generated.push(mkTask('Break','break', c, e, 'low'));
+    }
+  });
+
+  generated.forEach(tk=>{
+    tk.day = day;
+    tk.startISO = fromMinutes(day, tk.startMin);
+    tk.endISO = fromMinutes(day, tk.endMin);
+  });
+  generated.sort((a,b)=>a.startMin-b.startMin);
+  state.tasks.push(...generated);
+  save();
+}
+
+function mkTask(title, category, startMin, endMin, priority, goalId){
+  return { id: uid(), title, category, startMin, endMin, priority: priority||'medium',
+    status:'pending', goalId: goalId||null, aiGenerated:true };
+}
+
+/* reschedule a missed task into next free gap today */
+function rescheduleMissed(task){
+  const dayTasks = state.tasks.filter(t=>t.day===task.day && t.id!==task.id)
+    .sort((a,b)=>a.startMin-b.startMin);
+  const dur = task.endMin - task.startMin;
+  let cursor = Math.max(task.endMin, minutesNow());
+  for(const dt of dayTasks){
+    if(dt.startMin < cursor) continue;
+    if(dt.startMin - cursor >= dur){
+      task.startMin = cursor; task.endMin = cursor+dur;
+      task.startISO = fromMinutes(task.day, task.startMin);
+      task.endISO = fromMinutes(task.day, task.endMin);
+      task.status='pending';
+      save();
+      return;
+    }
+    cursor = dt.endMin;
+  }
+  task.status='missed'; save();
+}
+function minutesNow(){ const n=new Date(); return n.getHours()*60+n.getMinutes(); }
+
+/* ---------------- RENDERING: TODAY ---------------- */
+const ICONS = {study:'📖',work:'💼',exercise:'🏋️',meal:'🍽️',sleep:'🌙',travel:'🚶',break:'☕',personal:'🧘',goal:'🚩',other:'•'};
+
+function renderTaskList(containerId, day){
+  const container = document.getElementById(containerId);
+  const tasks = state.tasks.filter(t=>t.day===day).sort((a,b)=>a.startMin-b.startMin);
+  container.innerHTML = '';
+  if(tasks.length===0){
+    container.innerHTML = `<div class="empty-state">${t('noTasksToday')}<br>
+      <button class="btn" style="margin-top:12px;" onclick="openTaskModal(null, '${day}')">${t('addTaskFab')}</button>
+      <div style="margin-top:10px;">
+        <button class="btn secondary small" onclick="generateSchedule('${day}');renderAll();">${t('aiSuggestBtn')}</button>
+      </div>
+    </div>`;
+    return;
+  }
+  tasks.forEach(task=>{
+    const card = document.createElement('div');
+    card.className = 'glass task-card';
+    const done = task.status==='completed', skipped = task.status==='skipped';
+    card.innerHTML = `
+      <div class="task-icon">${task.category==='break' && task.breakActivity ? (BREAK_ACTIVITY_ICONS[task.breakActivity]||ICONS[task.category]) : (ICONS[task.category]||'•')}</div>
+      <div style="flex:1;">
+        <div class="task-title-row">
+          <div class="task-title ${done||skipped?'done':''}">${task.title}</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="badge ${task.priority}">${task.priority.toUpperCase()}</div>
+            <button class="icon-btn" style="width:26px;height:26px;font-size:11px;" onclick="openTaskModal('${task.id}')" title="Edit">✎</button>
+          </div>
+        </div>
+        <div class="task-time">${fmtTime(task.startMin)} – ${fmtTime(task.endMin)}</div>
+        ${!done && !skipped ? `<div class="task-actions">
+          ${task.status==='pending' ? `<button class="action-btn start" onclick="startTask('${task.id}')">${t('startBtn')}</button>` : ''}
+          ${task.status==='inProgress' ? `<button class="action-btn complete" onclick="completeTask('${task.id}')">${t('completeBtn')}</button>` : ''}
+          <button class="action-btn skip" onclick="skipTask('${task.id}')">${t('skipBtn')}</button>
+        </div>` : done ? `<div style="color:var(--success);font-size:12px;">${t('completedLabel')}</div>` : ''}
+      </div>`;
+    container.appendChild(card);
+  });
+}
+function fmtTime(min){
+  min=((min%1440)+1440)%1440;
+  let h=Math.floor(min/60), m=min%60;
+  const period = h>=12?'PM':'AM'; h=h%12; if(h===0)h=12;
+  return `${h}:${String(m).padStart(2,'0')} ${period}`;
+}
+
+function findTask(id){ return state.tasks.find(t=>t.id===id); }
+function startTask(id){ const tk=findTask(id); tk.status='inProgress'; save(); renderAll(); openFocus(tk); }
+function completeTask(id){
+  const tk=findTask(id);
+  const proofMsg = state.lang==='en' ? `Confirm: did you really complete "${tk.title}"?` : `Confirm karo: kya aapne sach mein "${tk.title}" pura kar liya?`;
+  if(!confirm(proofMsg)) return;
+  tk.status='completed'; awardXP(10); updateStreak(); save(); renderAll();
+}
+function skipTask(id){ const tk=findTask(id); tk.status='skipped'; save(); renderAll(); }
+
+/* ---------------- CALENDAR ---------------- */
+function renderDaySelector(){
+  const wrap = document.getElementById('daySelector');
+  wrap.innerHTML='';
+  const base = new Date();
+  base.setDate(base.getDate() - base.getDay()+1);
+  for(let i=0;i<7;i++){
+    const d = new Date(base); d.setDate(base.getDate()+i);
+    const iso = todayISO(d);
+    const pill = document.createElement('div');
+    pill.className = 'day-pill' + (iso===state.selectedDay ? ' active':'');
+    pill.innerHTML = `<div>${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i]}</div><div style="font-weight:700;">${d.getDate()}</div>`;
+    pill.onclick = ()=>{ state.selectedDay = iso; save(); renderAll(); };
+    wrap.appendChild(pill);
+  }
+}
+
+/* ---------------- ANALYTICS ---------------- */
+function renderAnalytics(){
+  const tasks = state.tasks.filter(t=>t.day===todayISO());
+  const completed = tasks.filter(t=>t.status==='completed');
+  const rate = tasks.length ? completed.length/tasks.length : 0;
+  const focusMinutes = completed.reduce((sum,t)=>sum+(t.endMin-t.startMin),0);
+  const score = Math.min(100, Math.round(rate*70 + Math.min(1, focusMinutes/(tasks.length*30||1))*30));
+
+  document.getElementById('statFocus').textContent = (focusMinutes/60).toFixed(1)+'h';
+  document.getElementById('statCompleted').textContent = completed.length;
+  document.getElementById('statScore').textContent = score;
+  document.getElementById('ringPercent').textContent = Math.round(rate*100)+'%';
+  const circumference = 490;
+  document.getElementById('ringProgress').style.strokeDashoffset = circumference - (circumference*rate);
+  renderMonthlySummary();
+  renderActivityLog();
+  renderGamificationUI();
+  renderWeeklyBarChart();
+}
+function renderWeeklyBarChart(){
+  const el = document.getElementById('weeklyBarChart');
+  if(!el) return;
+  const days = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const iso = todayISO(d);
+    const mins = state.tasks.filter(t=>t.day===iso && t.status==='completed').reduce((s,t)=>s+(t.endMin-t.startMin),0);
+    days.push({ iso, hours: mins/60, label: d.toLocaleDateString(state.lang==='en'?'en-IN':'hi-IN',{weekday:'narrow'}) });
+  }
+  const maxH = Math.max(1, ...days.map(d=>d.hours));
+  el.innerHTML = days.map(d=>{
+    const h = Math.max(4, Math.round((d.hours/maxH)*100));
+    const isToday = d.iso === todayISO();
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+      <div style="font-size:10px;color:var(--text-secondary);">${d.hours.toFixed(1)}h</div>
+      <div style="width:100%;max-width:28px;height:${h}px;border-radius:6px 6px 2px 2px;background:${isToday ? 'linear-gradient(180deg,var(--gold),var(--gold-dark))' : 'linear-gradient(180deg,var(--neon-blue),var(--neon-purple))'};"></div>
+      <div style="font-size:10px;color:${isToday?'var(--gold)':'var(--text-secondary)'};font-weight:${isToday?'700':'400'};">${d.label}</div>
+    </div>`;
+  }).join('');
+}
+function renderMonthlySummary(){
+  const now = new Date();
+  const cutoff = new Date(now); cutoff.setDate(cutoff.getDate()-30);
+  const cutoffISO = cutoff.toISOString().slice(0,10);
+  const monthTasks = state.tasks.filter(t=>t.day>=cutoffISO && t.day<=todayISO() && t.status==='completed');
+  const totalMinutes = monthTasks.reduce((sum,t)=>sum+(t.endMin-t.startMin),0);
+  const totalHours = (totalMinutes/60).toFixed(1);
+  const avgPerDay = (monthTasks.length/30).toFixed(1);
+  document.getElementById('statMonthCompleted').textContent = monthTasks.length;
+  document.getElementById('statMonthHours').textContent = totalHours+'h';
+  document.getElementById('statMonthAvg').textContent = avgPerDay;
+}
+function renderActivityLog(){
+  const el = document.getElementById('activityLog');
+  if(!el) return;
+  const breakTasks = state.tasks
+    .filter(t=>t.category==='break' && t.status==='completed')
+    .sort((a,b)=> (b.day+String(b.startMin).padStart(4,'0')).localeCompare(a.day+String(a.startMin).padStart(4,'0')))
+    .slice(0,20);
+  if(breakTasks.length===0){
+    el.innerHTML = `<div class="empty-state">${t('noActivityLog')}</div>`;
+    return;
+  }
+  el.innerHTML = breakTasks.map(tk=>{
+    const icon = BREAK_ACTIVITY_ICONS[tk.breakActivity] || '☕';
+    const label = tk.breakActivity && BREAK_ACTIVITY_KEYS[tk.breakActivity] ? t(BREAK_ACTIVITY_KEYS[tk.breakActivity]) : tk.title;
+    return `<div class="glass" style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:10px 14px;">
+      <div style="font-size:20px;">${icon}</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;">${label}</div>
+        <div style="font-size:11px;color:var(--text-secondary);">${tk.day} · ${fmtTime(tk.startMin)}–${fmtTime(tk.endMin)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------------- GOALS ---------------- */
+let activeGoalPeriod = 'daily';
+document.getElementById('goalPeriodChips').addEventListener('click', e=>{
+  if(e.target.classList.contains('chip')){
+    document.querySelectorAll('#goalPeriodChips .chip').forEach(c=>c.classList.remove('active'));
+    e.target.classList.add('active');
+    activeGoalPeriod = e.target.dataset.period;
+    renderGoals();
+  }
+});
+function addGoal(){
+  const input = document.getElementById('newGoalTitle');
+  if(!input.value.trim()) return;
+  state.goals.push({id:uid(), title:input.value.trim(), period:activeGoalPeriod, priority:'medium', completed:false});
+  input.value='';
+  save(); renderGoals();
+}
+function toggleGoal(id){
+  const g = state.goals.find(g=>g.id===id);
+  g.completed = !g.completed;
+  save(); renderGoals();
+}
+function renderGoals(){
+  const list = document.getElementById('goalList');
+  const goals = state.goals.filter(g=>g.period===activeGoalPeriod);
+  list.innerHTML='';
+  if(goals.length===0){ list.innerHTML = '<div class="empty-state">No goals yet</div>'; return; }
+  goals.forEach(g=>{
+    const card = document.createElement('div');
+    card.className='glass';
+    card.style.display='flex'; card.style.alignItems='center'; card.style.justifyContent='space-between';
+    card.innerHTML = `<div style="${g.completed?'text-decoration:line-through;color:var(--text-secondary);':''}">${g.title}</div>
+      <button class="action-btn ${g.completed?'skip':'complete'}" onclick="toggleGoal('${g.id}')">${g.completed?'Undo':'✓'}</button>`;
+    list.appendChild(card);
+  });
+}
+
+/* ---------------- FOCUS MODE ---------------- */
+const QUOTES = [
+  "Small steps every day lead to big results.",
+  "Discipline is choosing what you want most.",
+  "Focus on progress, not perfection.",
+  "One task at a time. You've got this."
+];
+let focusTask=null, focusTimer=null, focusRemaining=0, focusTotal=0, focusPaused=false;
+
+let focusLockActive = false;
+let distractionCount = 0;
+function isFocusLockEnabled(){ return localStorage.getItem('schedule_lab_focuslock')==='1'; }
+
+function openFocus(task){
+  focusTask = task;
+  focusTotal = (task.endMin-task.startMin)*60 || 1500;
+  focusRemaining = focusTotal;
+  focusPaused = false;
+  document.getElementById('focusTitle').textContent = task.title;
+  document.getElementById('focusQuote').textContent = QUOTES[Math.floor(Math.random()*QUOTES.length)];
+  document.getElementById('focusOverlay').classList.add('active');
+  document.getElementById('pauseBtn').textContent = '⏸';
+  updateFocusRing();
+  clearInterval(focusTimer);
+  focusTimer = setInterval(tickFocus,1000);
+
+  focusLockActive = isFocusLockEnabled() && (task.category==='study' || task.category==='work');
+  const closeBtn = document.querySelector('.close-focus');
+  const lockBadge = document.getElementById('focusLockBadge');
+  distractionCount = 0;
+  updateDistractionUI();
+  if(focusLockActive){
+    if(closeBtn) closeBtn.style.display = 'none';
+    if(lockBadge) lockBadge.style.display = 'block';
+    if(document.documentElement.requestFullscreen){
+      document.documentElement.requestFullscreen().catch(()=>{});
+    }
+    history.pushState({focusLock:true}, '');
+    window.addEventListener('popstate', blockBackButton);
+    document.addEventListener('visibilitychange', trackDistraction);
+  } else {
+    if(closeBtn) closeBtn.style.display = 'flex';
+    if(lockBadge) lockBadge.style.display = 'none';
+  }
+}
+function blockBackButton(){
+  if(focusLockActive){
+    history.pushState({focusLock:true}, '');
+    alert(state.lang==='en' ? '🔒 Focus Lock is ON — finish or skip the task to exit.' : '🔒 Focus Lock chalu hai — exit karne ke liye task complete ya skip karo.');
+  }
+}
+function trackDistraction(){
+  if(document.hidden && focusLockActive){
+    distractionCount++;
+    updateDistractionUI();
+  }
+}
+function updateDistractionUI(){
+  const el = document.getElementById('distractionCount');
+  if(el) el.textContent = distractionCount;
+}
+function showStartWorkingPopup(){
+  alert('🚀 Start Working! / काम शुरू करो!\n\nStay focused, you got this.\nफोकस रखो, तुम कर सकते हो।');
+}
+let pomodoroActive = false;
+let pomodoroPhase = 'work'; // 'work' or 'break'
+const POMODORO_WORK_SEC = 25*60;
+const POMODORO_BREAK_SEC = 5*60;
+
+function togglePomodoroMode(){
+  pomodoroActive = !pomodoroActive;
+  const btn = document.getElementById('pomodoroToggleBtn');
+  const phaseLabel = document.getElementById('pomodoroPhaseLabel');
+  if(pomodoroActive){
+    pomodoroPhase = 'work';
+    focusTotal = POMODORO_WORK_SEC;
+    focusRemaining = POMODORO_WORK_SEC;
+    btn.textContent = state.lang==='en' ? '⏹ Stop Pomodoro' : '⏹ Pomodoro Band Karo';
+    phaseLabel.style.display = 'block';
+    phaseLabel.textContent = state.lang==='en' ? '🍅 Work Time' : '🍅 Kaam Ka Time';
+    updateFocusRing();
+  } else {
+    btn.textContent = t('startPomodoro');
+    phaseLabel.style.display = 'none';
+    if(focusTask){
+      focusTotal = (focusTask.endMin-focusTask.startMin)*60 || 1500;
+      focusRemaining = focusTotal;
+      updateFocusRing();
+    }
+  }
+}
+function tickFocus(){
+  if(focusPaused) return;
+  if(focusRemaining>0){
+    focusRemaining--;
+    updateFocusRing();
+  } else if(pomodoroActive){
+    // Switch phase
+    pomodoroPhase = pomodoroPhase==='work' ? 'break' : 'work';
+    focusTotal = pomodoroPhase==='work' ? POMODORO_WORK_SEC : POMODORO_BREAK_SEC;
+    focusRemaining = focusTotal;
+    playEndChime();
+    const phaseLabel = document.getElementById('pomodoroPhaseLabel');
+    phaseLabel.textContent = pomodoroPhase==='work'
+      ? (state.lang==='en' ? '🍅 Work Time' : '🍅 Kaam Ka Time')
+      : (state.lang==='en' ? '☕ Break Time' : '☕ Break Ka Time');
+    if(Notification.permission==='granted'){
+      new Notification(phaseLabel.textContent, {icon:'icon-192.png'});
+    }
+    updateFocusRing();
+  } else {
+    clearInterval(focusTimer);
+  }
+}
+function updateFocusRing(){
+  const m = Math.floor(focusRemaining/60), s = focusRemaining%60;
+  document.getElementById('focusTimer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const progress = 1 - focusRemaining/focusTotal;
+  document.getElementById('focusRing').style.strokeDashoffset = 490 - 490*progress;
+}
+function togglePause(){
+  focusPaused = !focusPaused;
+  document.getElementById('pauseBtn').textContent = focusPaused ? '▶' : '⏸';
+}
+function exitFocusLock(){
+  if(focusLockActive){
+    window.removeEventListener('popstate', blockBackButton);
+    document.removeEventListener('visibilitychange', trackDistraction);
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    focusLockActive = false;
+  }
+}
+function closeFocus(){
+  clearInterval(focusTimer);
+  document.getElementById('focusOverlay').classList.remove('active');
+  exitFocusLock();
+  pomodoroActive = false;
+  const btn = document.getElementById('pomodoroToggleBtn');
+  if(btn) btn.textContent = t('startPomodoro');
+  const phaseLabel = document.getElementById('pomodoroPhaseLabel');
+  if(phaseLabel) phaseLabel.style.display = 'none';
+}
+function completeFocusTask(){
+  if(focusTask){
+    const proofMsg = state.lang==='en' ? `Confirm: did you really complete "${focusTask.title}"?` : `Confirm karo: kya aapne sach mein "${focusTask.title}" pura kar liya?`;
+    if(!confirm(proofMsg)) return;
+    focusTask.status='completed'; awardXP(10); updateStreak(); save(); renderAll();
+  }
+  closeFocus();
+}
+
+/* ---------------- NATIVE PHONE ALARM (via Capacitor, works in background) ---------------- */
+function isNativeApp(){
+  return typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform && Capacitor.isNativePlatform();
+}
+function hashId(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){ h=(h*31+str.charCodeAt(i))|0; }
+  return Math.abs(h) % 2147483647;
+}
+async function scheduleNativeAlarms(){
+  if(!isNativeApp()) return;
+  if(!(Capacitor.Plugins && Capacitor.Plugins.LocalNotifications)) return;
+  const LN = Capacitor.Plugins.LocalNotifications;
+  try{
+    const perm = await LN.requestPermissions();
+    if(perm.display !== 'granted') return;
+
+    const pending = await LN.getPending();
+    if(pending.notifications.length){
+      await LN.cancel({ notifications: pending.notifications.map(n=>({id:n.id})) });
+    }
+
+    const today = todayISO();
+    const upcoming = state.tasks
+      .filter(tk=>tk.status==='pending' && tk.day>=today)
+      .slice(0,60);
+
+    const notifs = upcoming.map(tk=>{
+      const [y,m,d] = tk.day.split('-').map(Number);
+      const dt = new Date(y, m-1, d, Math.floor(tk.startMin/60), tk.startMin%60, 0);
+      return {
+        id: hashId(tk.id),
+        title: '⏰ ' + tk.title,
+        body: state.lang==='en' ? 'Time to start! ⏰' : 'Shuru karne ka time ho gaya! ⏰',
+        schedule: { at: dt, allowWhileIdle: true },
+        sound: 'alarm.wav',
+        smallIcon: 'ic_stat_icon'
+      };
+    }).filter(n => n.schedule.at.getTime() > Date.now());
+
+    if(notifs.length){
+      await LN.schedule({ notifications: notifs });
+    }
+  }catch(e){ console.error('Native alarm schedule error', e); }
+}
+
+/* ---------------- PREMIUM / SUBSCRIPTION SYSTEM ---------------- */
+const PREMIUM_PLANS = [
+  { id:'1m', months:1,  price:100, labelEn:'1 Month',  labelHi:'1 महीना',  tagEn:'',                 tagHi:'' },
+  { id:'3m', months:3,  price:270, labelEn:'3 Months', labelHi:'3 महीने',  tagEn:'Save ₹30',          tagHi:'₹30 बचाएं' },
+  { id:'6m', months:6,  price:500, labelEn:'6 Months', labelHi:'6 महीने',  tagEn:'Save ₹100',         tagHi:'₹100 बचाएं' },
+  { id:'1y', months:12, price:900, labelEn:'1 Year',   labelHi:'1 साल',    tagEn:'Save ₹300 · Best Value', tagHi:'₹300 बचाएं · बेस्ट वैल्यू' }
+];
+function isPremium(){
+  const until = parseInt(localStorage.getItem('schedule_lab_premium_until') || '0', 10);
+  return until > Date.now();
+}
+function openPremiumModal(){
+  renderPremiumPlanList();
+  document.getElementById('premiumModalOverlay').classList.add('active');
+}
+function closePremiumModal(){ document.getElementById('premiumModalOverlay').classList.remove('active'); }
+function renderPremiumPlanList(){
+  const list = document.getElementById('premiumPlanList');
+  list.innerHTML = PREMIUM_PLANS.map(p => `
+    <button class="btn secondary" style="width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;" onclick="openRazorpayCheckout('${p.id}')">
+      <span>
+        <b>${state.lang==='en'?p.labelEn:p.labelHi}</b>
+        ${p.tagEn ? `<br><span style="font-size:11px;color:var(--accent);">${state.lang==='en'?p.tagEn:p.tagHi}</span>` : ''}
+      </span>
+      <span style="font-size:16px;font-weight:700;">₹${p.price}</span>
+    </button>
+  `).join('');
+}
+
+/* ---------------- RAZORPAY PAYMENT (Standard Checkout with backend order + signature verification) ---------------- */
+const RAZORPAY_KEY_ID = 'rzp_test_TK1vq9d9HMmqfr'; // public Key ID — safe to expose in frontend code
+async function openRazorpayCheckout(planId){
+  const plan = PREMIUM_PLANS.find(p => p.id === planId) || PREMIUM_PLANS[0];
+  if(typeof Razorpay === 'undefined'){
+    alert('Razorpay script load nahi hua — internet check karo.');
+    return;
+  }
+
+  // STEP 1: ask our backend (Netlify Function) to create a Razorpay order
+  let order;
+  try{
+    const res = await fetch('/api/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: plan.price * 100, // paise
+        currency: 'INR',
+        receipt: `plan_${plan.id}_${Date.now()}`
+      })
+    });
+    if(!res.ok){
+      const errBody = await res.json().catch(()=>({}));
+      throw new Error(errBody.error || `Order creation failed (${res.status})`);
+    }
+    order = await res.json();
+  }catch(e){
+    console.error('create-order error', e);
+    alert(state.lang==='en' ? 'Could not start payment. Please try again.' : 'Payment shuru nahi ho paya. Dobara try karo.');
+    return;
+  }
+
+  // STEP 2: open Razorpay Standard Checkout using the order_id from our backend
+  const options = {
+    key: RAZORPAY_KEY_ID,
+    order_id: order.order_id,
+    amount: order.amount,
+    currency: order.currency,
+    name: 'Schedule Lab',
+    description: state.lang==='en' ? `Premium Subscription (${plan.labelEn})` : `प्रीमियम सब्सक्रिप्शन (${plan.labelHi})`,
+    handler: async function(response){
+      // STEP 3: verify the payment signature on our backend before unlocking anything
+      try{
+        const verifyRes = await fetch('/api/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature
+          })
+        });
+        const verifyData = await verifyRes.json();
+        if(!verifyRes.ok || !verifyData.success){
+          alert(state.lang==='en' ? 'Payment could not be verified. Contact support.' : 'Payment verify nahi ho paya. Support se contact karo.');
+          return;
+        }
+        grantPremium(plan.months);
+        localStorage.setItem('schedule_lab_premium_payment_id', response.razorpay_payment_id);
+        closePremiumModal();
+        alert(state.lang==='en' ? '⭐ Payment successful! Premium unlocked.' : '⭐ Payment ho gaya! Premium unlock ho gaya.');
+        renderProfileModal();
+      }catch(e){
+        console.error('verify-payment error', e);
+        alert(state.lang==='en' ? 'Payment could not be verified. Contact support.' : 'Payment verify nahi ho paya. Support se contact karo.');
+      }
+    },
+    modal: {
+      ondismiss: function(){
+        // user closed the checkout modal without paying
+        console.log('Checkout dismissed by user');
+      }
+    },
+    prefill: {
+      name: state.profile ? state.profile.fullName : '',
+      email: localStorage.getItem('schedule_lab_email') || ''
+    },
+    theme: { color: '#4da6ff' }
+  };
+  const rzp = new Razorpay(options);
+  rzp.on('payment.failed', function(response){
+    console.error('Payment failed', response.error);
+    alert(state.lang==='en' ? `Payment failed: ${response.error.description}` : `Payment fail ho gaya: ${response.error.description}`);
+  });
+  rzp.open();
+}
+function grantPremium(months){
+  const now = Date.now();
+  const existingUntil = parseInt(localStorage.getItem('schedule_lab_premium_until') || '0', 10);
+  const base = existingUntil > now ? existingUntil : now; // extend if already active
+  const until = base + months * 30 * 24 * 60 * 60 * 1000;
+  localStorage.setItem('schedule_lab_premium_until', String(until));
+  localStorage.setItem('schedule_lab_premium', '1'); // legacy flag, kept for compatibility
+}
+function requirePremium(featureName){
+  if(isPremium()) return true;
+  openPremiumModal();
+  return false;
+}
+
+/* ---------------- WATER & SLEEP REMINDERS ---------------- */
+let lastWaterReminderHour = null;
+function checkWaterReminder(){
+  if(!alertsEnabled || !state.profile) return;
+  const now = new Date();
+  const hour = now.getHours();
+  const wake = state.profile.wakeUpTime ? parseInt(state.profile.wakeUpTime.split(':')[0]) : 7;
+  const sleep = state.profile.sleepTime ? parseInt(state.profile.sleepTime.split(':')[0]) : 23;
+  const awakeNow = sleep > wake ? (hour>=wake && hour<sleep) : (hour>=wake || hour<sleep);
+  if(!awakeNow) return;
+  if(now.getMinutes() !== 0) return;
+  if(hour % 2 !== 0) return;
+  if(lastWaterReminderHour === hour) return;
+  lastWaterReminderHour = hour;
+  playChime();
+  if(Notification.permission==='granted'){
+    const n = new Notification(state.lang==='en' ? '💧 Water Break' : '💧 पानी पीने का समय', {
+      body: state.lang==='en' ? 'Time to drink some water!' : 'Thoda paani pi lo!',
+      icon:'icon-192.png'
+    });
+    n.onclick = () => { window.focus(); n.close(); };
+  }
+}
+let sleepReminderFiredToday = null;
+function checkSleepReminder(){
+  if(!alertsEnabled || !state.profile || !state.profile.sleepTime) return;
+  const [sh, sm] = state.profile.sleepTime.split(':').map(Number);
+  const now = new Date();
+  const sleepMin = sh*60+sm;
+  const nowMin = now.getHours()*60+now.getMinutes();
+  const today = todayISO();
+  if(sleepReminderFiredToday === today) return;
+  if(nowMin >= sleepMin-30 && nowMin < sleepMin-28){
+    sleepReminderFiredToday = today;
+    playChime();
+    if(Notification.permission==='granted'){
+      const n = new Notification(state.lang==='en' ? '😴 Wind Down Time' : '😴 Sone ki taiyari karo', {
+        body: state.lang==='en' ? 'Your sleep time is in 30 minutes. Start winding down.' : 'Aapka sone ka time 30 minute me hai. Taiyari shuru karo.',
+        icon:'icon-192.png'
+      });
+      n.onclick = () => { window.focus(); n.close(); };
+    }
+  }
+}
+
+/* TASK REMINDER — kisi bhi task ka time hone par awaaz mein bolke batata hai */
+let taskAlertedIds = new Set();
+function speakReminder(text){
+  try{
+    if('speechSynthesis' in window){
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = state.lang==='en' ? 'en-IN' : 'hi-IN';
+      utter.rate = 0.95;
+      speechSynthesis.speak(utter);
+    }
+  }catch(e){}
+}
+function checkAllTaskReminder(){
+  if(!alertsEnabled) return;
+  const today = todayISO();
+  const nowMin = minutesNow();
+  state.tasks.filter(tk => tk.day===today && tk.status==='pending')
+    .forEach(tk=>{
+      if(taskAlertedIds.has(tk.id)) return;
+      if(nowMin >= tk.startMin && nowMin < tk.startMin+2){
+        taskAlertedIds.add(tk.id);
+        playAlarmRing();
+        const msg = state.lang==='en' ? `Time for ${tk.title}.` : `${tk.title} ka time ho gaya hai.`;
+        speakReminder(msg);
+        if(Notification.permission==='granted'){
+          const n = new Notification('⏰ ' + tk.title, { body: msg, icon:'icon-192.png' });
+          n.onclick = () => { window.focus(); n.close(); };
+        }
+      }
+    });
+}
+setInterval(()=>{ checkWaterReminder(); checkSleepReminder(); checkAllTaskReminder(); }, 60000);
+
+/* ---------------- OFFLINE SCREEN ---------------- */
+function showOfflineScreen(){
+  const el = document.getElementById('offlineScreen');
+  if(el) el.style.display = 'flex';
+}
+function hideOfflineScreen(){
+  const el = document.getElementById('offlineScreen');
+  if(el) el.style.display = 'none';
+}
+function updateNetworkStatus(){
+  if(navigator.onLine === false){
+    showOfflineScreen();
+  } else {
+    hideOfflineScreen();
+  }
+}
+window.addEventListener('offline', updateNetworkStatus);
+window.addEventListener('online', updateNetworkStatus);
+
+/* ---------------- LIVE CLOCK ---------------- */
+function updateLiveClock(){
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('liveClock').textContent = `${h}:${m}:${s}`;
+  const dateFmt = now.toLocaleDateString(state.lang==='en' ? 'en-IN' : 'hi-IN', {weekday:'short', day:'numeric', month:'short'});
+  document.getElementById('liveDate').textContent = dateFmt;
+}
+setInterval(updateLiveClock, 1000);
+
+/* ---------------- GOOGLE SIGN-IN ---------------- */
+// ============================================================
+// GOOGLE LOGIN — CLIENT ID CHAHIYE
+// Google Cloud Console (console.cloud.google.com) mein jaake:
+// 1. Naya project banao
+// 2. "APIs & Services" -> "Credentials" -> "Create Credentials" -> "OAuth client ID"
+// 3. Application type: "Web application"
+// 4. Authorized JavaScript origins mein apni site ka URL daalo
+//    (jaise https://schedule-lab.pages.dev)
+// 5. Client ID copy karke neeche paste karo
+// ============================================================
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com';
+
+function initGoogleSignIn(){
+  if(!window.google || !window.google.accounts || GOOGLE_CLIENT_ID.indexOf('YOUR_GOOGLE_CLIENT_ID_HERE') !== -1){
+    return; // library not loaded yet, or client ID not set up yet
+  }
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleSignIn
+  });
+  const btnEl = document.getElementById('googleSignInBtn');
+  if(btnEl){
+    google.accounts.id.renderButton(btnEl, {
+      theme:'outline', size:'large', width:280,
+      text:'continue_with', shape:'pill'
+    });
+  }
+}
+
+function decodeJwt(token){
+  try{
+    const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
+      '%' + ('00'+c.charCodeAt(0).toString(16)).slice(-2)
+    ).join('')));
+  }catch(e){ return null; }
+}
+
+function handleGoogleSignIn(response){
+  const payload = decodeJwt(response.credential);
+  if(!payload || !payload.email) return;
+  // Google ne pehle hi email verify kar diya hai, isliye OTP skip karke seedha login
+  const name = payload.name || payload.email.split('@')[0];
+  const email = payload.email;
+  localStorage.setItem('schedule_lab_email', email);
+  localStorage.setItem('schedule_lab_login_name', name);
+  localStorage.setItem('schedule_lab_google_login', '1');
+  if(payload.picture) localStorage.setItem('schedule_lab_photo', payload.picture);
+  document.getElementById('loginGate').style.display='none';
+  document.getElementById('otpGate').style.display='none';
+  if(state.profile){
+    showMainApp();
+  } else {
+    document.getElementById('onboarding').style.display='block';
+    const fn = document.getElementById('fullName');
+    if(fn && !fn.value) fn.value = name;
+  }
+}
+// Try to init right away, and also retry after the GSI script finishes loading
+window.addEventListener('load', () => setTimeout(initGoogleSignIn, 300));
+
+/* ---------------- LOGIN GATE ---------------- */
+let pendingLogin = null; // holds {name,email,password} while OTP is being verified
+
+function submitLoginGate(){
+  const name = document.getElementById('loginName').value.trim();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  if(!name){ errEl.textContent='Naam daalo.'; errEl.style.display='block'; return; }
+  if(!/^[^\s@]+@gmail\.com$/i.test(email)){
+    errEl.textContent='Sahi Gmail ID daalo (example@gmail.com).';
+    errEl.style.display='block';
+    return;
+  }
+  if(!password || password.length < 4){
+    errEl.textContent='Password kam se kam 4 characters ka daalo.';
+    errEl.style.display='block';
+    return;
+  }
+  errEl.style.display='none';
+  // OTP verification is built but paused for now — direct login (jaise pehle tha)
+  pendingLogin = {name, email, password};
+  finalizeLoginAfterOtp();
+}
+
+function generateOtpCode(){
+  return String(Math.floor(100000 + Math.random()*900000)); // 6-digit code
+}
+
+// ============================================================
+// EMAIL SENDING — PLACEHOLDER
+// Filhaal yahan koi real email API connected nahi hai.
+// Jab tumhare paas email-sending function/API key ho (jaise
+// EmailJS, ya apna Cloudflare function jo email bheje), tab
+// isi function ke andar us API ko call karna — code (otpCode)
+// aur email (toEmail) usko pass kar dena.
+// Jab tak API connect nahi hoti, code neeche testing ke liye
+// screen par dikha diya jaata hai taaki app test kar sako.
+// ============================================================
+async function sendOtpEmailAPI(toEmail, otpCode){
+  // TODO: Apna email API yahan call karo, jaise:
+  // await fetch('/api/send-otp', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: toEmail, code: otpCode }) });
+  return false; // false = API abhi connect nahi hui (testing mode)
+}
+
+async function sendOtp(isResend){
+  if(!pendingLogin) return;
+  const code = generateOtpCode();
+  localStorage.setItem('schedule_lab_otp_code', code);
+  localStorage.setItem('schedule_lab_otp_time', String(Date.now()));
+  const statusEl = document.getElementById('otpStatus');
+  const sent = await sendOtpEmailAPI(pendingLogin.email, code);
+  if(sent){
+    statusEl.style.display='block';
+    statusEl.style.color = 'var(--text-secondary)';
+    statusEl.textContent = isResend ? 'Naya code bhej diya gaya hai.' : 'Code bhej diya gaya hai, apna email check karo.';
+  } else {
+    // Testing mode — real email API abhi connected nahi, isliye code yahin dikha rahe hain
+    statusEl.style.display='block';
+    statusEl.style.color = 'var(--gold)';
+    statusEl.textContent = 'Testing mode — email API abhi connect nahi hui. Tumhara code: ' + code;
+  }
+}
+
+function verifyOtp(){
+  const input = document.getElementById('otpInput').value.trim();
+  const statusEl = document.getElementById('otpStatus');
+  const savedCode = localStorage.getItem('schedule_lab_otp_code');
+  const savedTime = parseInt(localStorage.getItem('schedule_lab_otp_time') || '0', 10);
+  const expired = (Date.now() - savedTime) > 10*60*1000; // 10 minute expiry
+  if(expired){
+    statusEl.style.display='block';
+    statusEl.style.color = 'var(--danger)';
+    statusEl.textContent = 'Code expire ho gaya, "Resend code" dabao.';
+    return;
+  }
+  if(!input || input !== savedCode){
+    statusEl.style.display='block';
+    statusEl.style.color = 'var(--danger)';
+    statusEl.textContent = 'Galat code, dobara try karo.';
+    return;
+  }
+  // Correct — finalize login
+  localStorage.removeItem('schedule_lab_otp_code');
+  localStorage.removeItem('schedule_lab_otp_time');
+  finalizeLoginAfterOtp();
+}
+
+function backFromOtp(){
+  document.getElementById('otpGate').style.display='none';
+  document.getElementById('loginGate').style.display='block';
+  document.getElementById('otpStatus').style.display='none';
+}
+
+function finalizeLoginAfterOtp(){
+  if(!pendingLogin) return;
+  const {name, email, password} = pendingLogin;
+  localStorage.setItem('schedule_lab_email', email);
+  localStorage.setItem('schedule_lab_login_name', name);
+  localStorage.setItem('schedule_lab_pass', btoa(password));
+  document.getElementById('otpGate').style.display='none';
+  pendingLogin = null;
+  if(state.profile){
+    showMainApp();
+  } else {
+    document.getElementById('onboarding').style.display='block';
+    const fn = document.getElementById('fullName');
+    if(fn && !fn.value) fn.value = name;
+  }
+}
+
+function checkLoginGate(){
+  const email = localStorage.getItem('schedule_lab_email');
+  if(!email){
+    document.getElementById('loginGate').style.display='block';
+    return false;
+  }
+  return true;
+}
+
+/* ---------------- BACKUP EXPORT / IMPORT ---------------- */
+function exportBackup(){
+  const backup = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    state: JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'),
+    alerts: localStorage.getItem('schedule_lab_alerts') || '0',
+    photo: localStorage.getItem('schedule_lab_photo') || null,
+    email: localStorage.getItem('schedule_lab_email') || null,
+    loginName: localStorage.getItem('schedule_lab_login_name') || null
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const name = (state.profile && state.profile.fullName ? state.profile.fullName.replace(/\s+/g,'_') : 'schedule_lab');
+  a.href = url;
+  a.download = `${name}_backup_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function importBackup(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const backup = JSON.parse(reader.result);
+      if(!backup.state || !backup.state.profile){
+        alert('Ye file valid backup nahi lag rahi.');
+        return;
+      }
+      if(!confirm('Import karne se abhi ka data overwrite ho jaayega. Continue?')) return;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(backup.state));
+      if(backup.alerts) localStorage.setItem('schedule_lab_alerts', backup.alerts);
+      if(backup.photo) localStorage.setItem('schedule_lab_photo', backup.photo);
+      if(backup.email) localStorage.setItem('schedule_lab_email', backup.email);
+      if(backup.loginName) localStorage.setItem('schedule_lab_login_name', backup.loginName);
+      alert('Backup restore ho gaya! App reload ho raha hai.');
+      location.reload();
+    }catch(e){
+      alert('File padhne me error aaya: ' + e.message);
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value = '';
+}
+
+/* ---------------- PROFILE / SETTINGS / PERMISSIONS / LOGOUT ---------------- */
+function openProfileModal(){
+  if(!state.profile){ alert('Pehle onboarding complete karo.'); return; }
+  renderProfileModal();
+  document.getElementById('profileModalOverlay').classList.add('active');
+}
+function closeProfileModal(){
+  document.getElementById('profileModalOverlay').classList.remove('active');
+}
+function renderProfileModal(){
+  const p = state.profile;
+  renderTimeLimitUI();
+  document.getElementById('profName').value = p.fullName;
+  document.getElementById('profEmail').value = localStorage.getItem('schedule_lab_email') || '';
+  document.getElementById('profAge').value = p.age;
+  document.getElementById('profWake').value = p.wakeUpTime;
+  document.getElementById('profSleep').value = p.sleepTime;
+  document.getElementById('profDutyStart').value = p.dutyStart;
+  document.getElementById('profDutyEnd').value = p.dutyEnd;
+  document.getElementById('profMainGoal').value = p.mainGoal || '';
+  renderProfilePhotoUI();
+
+  const wrap = document.getElementById('profUserTypeChips');
+  wrap.innerHTML = '';
+  USER_TYPES.forEach(u=>{
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (u.key===p.userType ? ' active' : '');
+    chip.textContent = u[state.lang];
+    chip.onclick = ()=>{ p.userType = u.key; renderProfileModal(); };
+    wrap.appendChild(chip);
+  });
+
+  document.getElementById('profLangStatus').textContent = state.lang==='en' ? 'English' : 'हिंदी';
+  document.getElementById('profAlertStatus').textContent = alertsEnabled ? t('alertsOn').split(' — ')[0] || (state.lang==='en'?'On':'चालू') : (state.lang==='en'?'Off':'बंद');
+  document.getElementById('profAlertBtn').textContent = alertsEnabled ? (state.lang==='en'?'Disable':'बंद करें') : t('enableBtn');
+  document.getElementById('focusLockStatus').textContent = isFocusLockEnabled() ? (state.lang==='en'?'On':'चालू') : (state.lang==='en'?'Off':'बंद');
+  document.getElementById('focusLockBtn').textContent = isFocusLockEnabled() ? (state.lang==='en'?'Disable':'बंद करें') : t('enableBtn');
+  const isLight = document.body.classList.contains('light-mode');
+  document.getElementById('themeStatus').textContent = isLight ? (state.lang==='en'?'Light':'लाइट') : (state.lang==='en'?'Dark':'डार्क');
+  document.getElementById('themeToggleBtn').textContent = isLight ? (state.lang==='en'?'Dark':'डार्क') : (state.lang==='en'?'Light':'लाइट');
+
+  const permEl = document.getElementById('permNotifStatus');
+  if('Notification' in window){
+    permEl.textContent = Notification.permission==='granted' ? (state.lang==='en'?'Allowed ✅':'अनुमति है ✅')
+      : Notification.permission==='denied' ? (state.lang==='en'?'Blocked ❌ (allow it in browser settings)':'रोका गया है ❌ (ब्राउज़र सेटिंग्स में अनुमति दें)')
+      : (state.lang==='en'?'Not asked yet':'अभी नहीं पूछा गया');
+  } else {
+    permEl.textContent = state.lang==='en' ? 'Not supported in this browser' : 'इस ब्राउज़र में समर्थित नहीं है';
+  }
+  const micPermEl = document.getElementById('permMicStatus');
+  if(micPermEl){
+    if(navigator.permissions && navigator.permissions.query){
+      navigator.permissions.query({name:'microphone'}).then(status=>{
+        micPermEl.textContent = status.state==='granted' ? (state.lang==='en'?'Allowed ✅':'अनुमति है ✅')
+          : status.state==='denied' ? (state.lang==='en'?'Blocked ❌ (allow it in browser settings)':'रोका गया है ❌ (ब्राउज़र सेटिंग्स में अनुमति दें)')
+          : (state.lang==='en'?'Not asked yet':'अभी नहीं पूछा गया');
+      }).catch(()=>{ micPermEl.textContent = state.lang==='en'?'Not asked yet':'अभी नहीं पूछा गया'; });
+    } else {
+      micPermEl.textContent = state.lang==='en' ? 'Tap request to check' : 'Check karne ke liye request dabao';
+    }
+  }
+  document.getElementById('aboutText').textContent = t('aboutBody');
+  document.getElementById('copyAboutBtn').textContent = t('copyBtn');
+  renderChangelog();
+}
+function renderProfilePhotoUI(){
+  const photo = localStorage.getItem('schedule_lab_photo');
+  const preview = document.getElementById('profPhotoPreview');
+  const removeBtn = document.getElementById('profPhotoRemoveBtn');
+  if(photo){
+    preview.innerHTML = `<img src="${photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    removeBtn.style.display = 'inline-block';
+  } else {
+    preview.innerHTML = '🙂';
+    removeBtn.style.display = 'none';
+  }
+  syncHeaderProfileIcon();
+}
+function syncHeaderProfileIcon(){
+  const photo = localStorage.getItem('schedule_lab_photo');
+  const btn = document.getElementById('profileBtn');
+  if(photo){
+    btn.classList.add('has-photo');
+    btn.innerHTML = `<img src="${photo}">`;
+  } else {
+    btn.classList.remove('has-photo');
+    btn.innerHTML = '👤';
+  }
+}
+function onProfilePhotoSelected(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  if(file.size > 3*1024*1024){ alert('Photo 3MB se chhoti honi chahiye.'); return; }
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    localStorage.setItem('schedule_lab_photo', reader.result);
+    renderProfilePhotoUI();
+  };
+  reader.readAsDataURL(file);
+}
+function removeProfilePhoto(){
+  localStorage.removeItem('schedule_lab_photo');
+  renderProfilePhotoUI();
+}
+
+function saveProfileModal(){
+  const p = state.profile;
+  p.fullName = document.getElementById('profName').value || p.fullName;
+  p.age = parseInt(document.getElementById('profAge').value) || p.age;
+  p.wakeUpTime = document.getElementById('profWake').value;
+  p.sleepTime = document.getElementById('profSleep').value;
+  p.dutyStart = document.getElementById('profDutyStart').value;
+  p.dutyEnd = document.getElementById('profDutyEnd').value;
+  p.mainGoal = document.getElementById('profMainGoal').value;
+  save();
+  closeProfileModal();
+  renderAll();
+}
+function toggleFocusLockSetting(){
+  if(!isPremium()){ openPremiumModal(); return; }
+  const enabled = isFocusLockEnabled();
+  localStorage.setItem('schedule_lab_focuslock', enabled ? '0' : '1');
+  renderProfileModal();
+}
+function toggleTheme(){
+  if(!isPremium()){ openPremiumModal(); return; }
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('schedule_lab_theme', isLight ? 'light' : 'dark');
+  renderProfileModal();
+}
+function applyStoredTheme(){
+  if(isPremium() && localStorage.getItem('schedule_lab_theme') === 'light'){
+    document.body.classList.add('light-mode');
+  }
+}
+function toggleAlertsSetting(){
+  if(alertsEnabled){
+    alertsEnabled = false;
+    localStorage.setItem('schedule_lab_alerts','0');
+    renderProfileModal();
+    updateAlertUI();
+  } else {
+    enableAlerts();
+    setTimeout(renderProfileModal, 300);
+  }
+}
+function copyAboutText(){
+  const text = t('aboutBody');
+  const btn = document.getElementById('copyAboutBtn');
+  const done = ()=>{
+    btn.textContent = t('copiedBtn');
+    setTimeout(()=>{ btn.textContent = t('copyBtn'); }, 1800);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ alert('Copy nahi ho paya, manually select karke copy karo.'); }
+  document.body.removeChild(ta);
+}
+function requestNotifPermission(){
+  if(!('Notification' in window)){ alert('Notifications supported nahi hai.'); return; }
+  Notification.requestPermission().then(()=> renderProfileModal());
+}
+function requestMicPermission(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert(state.lang==='en' ? "Microphone access isn't supported in this browser." : "Is browser mein microphone access support nahi hai.");
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({ audio:true })
+    .then(stream=>{
+      stream.getTracks().forEach(track=>track.stop()); // just triggering the permission prompt, not recording
+      renderProfileModal();
+    })
+    .catch(()=>{ renderProfileModal(); });
+}
+/* DAILY APP TIME LIMIT — tracks how many minutes the app has been open
+   today (only while the tab is visible/active), and locks the app once
+   the user-set daily limit is reached. Resets automatically at midnight. */
+const TIME_LIMIT_KEY = 'schedule_lab_time_limit_min';
+const TIME_USAGE_KEY = 'schedule_lab_time_usage';
+
+function getTimeLimitMinutes(){
+  const v = parseInt(localStorage.getItem(TIME_LIMIT_KEY) || '0', 10);
+  return isNaN(v) ? 0 : v;
+}
+function getTodayUsageSeconds(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(TIME_USAGE_KEY) || 'null');
+    if(raw && raw.date === todayISO()) return raw.seconds || 0;
+  }catch(e){}
+  return 0;
+}
+function setTodayUsageSeconds(sec){
+  localStorage.setItem(TIME_USAGE_KEY, JSON.stringify({ date: todayISO(), seconds: sec }));
+}
+function saveTimeLimit(){
+  const input = document.getElementById('timeLimitInput');
+  let mins = parseInt(input.value, 10);
+  if(isNaN(mins) || mins < 0) mins = 0;
+  localStorage.setItem(TIME_LIMIT_KEY, String(mins));
+  renderTimeLimitUI();
+  alert(mins > 0
+    ? (state.lang==='en' ? `Daily limit set to ${mins} minutes.` : `Daily limit ${mins} minute set ho gayi.`)
+    : (state.lang==='en' ? 'Daily limit disabled.' : 'Daily limit band kar di gayi.'));
+}
+function renderTimeLimitUI(){
+  const limitMin = getTimeLimitMinutes();
+  const usedSec = getTodayUsageSeconds();
+  const usedMin = Math.floor(usedSec / 60);
+  const textEl = document.getElementById('timeLimitUsageText');
+  const barEl = document.getElementById('timeLimitBar');
+  const inputEl = document.getElementById('timeLimitInput');
+  if(textEl) textEl.textContent = `Today: ${usedMin} / ${limitMin > 0 ? limitMin : '∞'} min`;
+  if(barEl) barEl.style.width = limitMin > 0 ? Math.min(100, (usedSec/60/limitMin)*100) + '%' : '0%';
+  if(inputEl && document.activeElement !== inputEl) inputEl.value = limitMin > 0 ? limitMin : '';
+}
+function checkTimeLimitLock(){
+  const limitMin = getTimeLimitMinutes();
+  const lockScreen = document.getElementById('timeLimitLockScreen');
+  if(!lockScreen) return;
+  if(limitMin > 0 && getTodayUsageSeconds() >= limitMin * 60){
+    lockScreen.style.display = 'flex';
+  } else {
+    lockScreen.style.display = 'none';
+  }
+}
+// Tick every 1s while the tab is visible/foreground; save every 5s to avoid excess writes
+let timeLimitTickCount = 0;
+setInterval(()=>{
+  if(document.visibilityState !== 'visible') return;
+  const limitMin = getTimeLimitMinutes();
+  if(limitMin <= 0) return; // no limit set, don't bother tracking
+  let usedSec = getTodayUsageSeconds();
+  if(usedSec >= limitMin*60){ checkTimeLimitLock(); return; }
+  usedSec += 1;
+  timeLimitTickCount++;
+  if(timeLimitTickCount % 5 === 0 || usedSec >= limitMin*60){
+    setTodayUsageSeconds(usedSec);
+    renderTimeLimitUI();
+    checkTimeLimitLock();
+  }
+}, 1000);
+
+function logoutUser(){
+  if(!confirm('Logout karne se aapka profile, schedule aur goals delete ho jaayenge is device se. Continue?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem('schedule_lab_alerts');
+  localStorage.removeItem('schedule_lab_photo');
+  localStorage.removeItem('schedule_lab_email');
+  localStorage.removeItem('schedule_lab_login_name');
+  localStorage.removeItem('schedule_lab_pass');
+  location.reload();
+}
+
+/* ---------------- WHAT'S NEW / CHANGELOG ---------------- */
+const APP_VERSION = 'v1.9';
+const CHANGELOG = [
+  { version:'v1.9', en:['💧 Water & 😴 Sleep reminders','🤖 AI Motivation Chat Assistant','☀️ Light/Dark theme toggle'], hi:['💧 पानी और 😴 नींद रिमाइंडर','🤖 AI मोटिवेशन चैट असिस्टेंट','☀️ लाइट/डार्क थीम टॉगल'] },
+  { version:'v1.8', en:['🏆 XP, Levels, Streaks & Badges','📈 Weekly study hours graph','🍅 Pomodoro Timer (25/5)'], hi:['🏆 XP, लेवल, स्ट्रीक और बैज','📈 साप्ताहिक पढ़ाई घंटे ग्राफ','🍅 पोमोडोरो टाइमर (25/5)'] },
+  { version:'v1.4', en:['Notifications now show full task info and open the app on tap'], hi:['नोटिफिकेशन अब पूरी जानकारी दिखाती है और टैप करने पर ऐप खोलती है'] },
+  { version:'v1.1', en:['🔒 Focus Lock mode for Study/Work tasks','📆 Monthly summary in Analytics','☕ Break activity tracking'], hi:['🔒 पढ़ाई/काम के लिए फोकस लॉक मोड','📆 एनालिटिक्स में मासिक सारांश','☕ ब्रेक एक्टिविटी ट्रैकिंग'] },
+  { version:'v1.0', en:['🎉 First release — custom daily schedule, calendar, goals, backup/restore'], hi:['🎉 पहला वर्शन — कस्टम डेली शेड्यूल, कैलेंडर, लक्ष्य, बैकअप/रीस्टोर'] }
+];
+function renderChangelog(){
+  const box = document.getElementById('changelogBox');
+  const label = document.getElementById('appVersionLabel');
+  const heading = document.getElementById('whatsNewHeading');
+  if(!box) return;
+  label.textContent = APP_VERSION;
+  if(heading) heading.innerHTML = (state.lang==='en' ? "🆕 What's New — " : '🆕 नया क्या है — ') + `<span id="appVersionLabel">${APP_VERSION}</span>`;
+  box.innerHTML = CHANGELOG.map(entry => `
+    <div style="margin-bottom:10px;">
+      <div style="color:var(--gold);font-weight:700;font-size:12.5px;">${entry.version}</div>
+      <ul style="margin:4px 0 0;padding-left:18px;">
+        ${entry[state.lang].map(line=>`<li>${line}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+/* ---------------- AI MOTIVATION ASSISTANT (Google Gemini API) ---------------- */
+const GEMINI_API_KEY = 'AQ.Ab8RN6JeUE7-jxtFOVTlIltqV6iliAXo7BgnRB_hEsvfjVkVVQ'; // Gemini auth key
+let aiChatHistory = [];
+
+const AI_RESPONSES = {
+  en: { greeting: ["Hey! I'm here to keep you motivated. How are you feeling about today's schedule?"] },
+  hi: { greeting: ["Hey! Main yahan hoon aapko motivate karne ke liye. Aaj ka schedule kaisa lag raha hai?"] }
+};
+
+async function aiChatReplyReal(userText){
+  if(GEMINI_API_KEY === 'GEMINI_API_KEY_HERE'){
+    return aiChatReplyFallback(userText); // use simple rules until key is added
+  }
+  const completed = state.tasks.filter(t=>t.status==='completed').length;
+  const todayList = state.tasks.filter(t=>t.day===todayISO())
+    .map(t=>`"${t.title}" at ${String(Math.floor(t.startMin/60)).padStart(2,'0')}:${String(t.startMin%60).padStart(2,'0')} [${t.status}]`).join(', ') || (state.lang==='en'?'none yet':'abhi koi nahi');
+  const actionRules = `
+You can also manage the user's schedule directly. Today's current tasks: ${todayList}.
+If (and only if) the user is clearly asking you to add, change, complete, or remove a task/schedule item, do BOTH of these:
+1. Reply to them normally in plain conversational text (2-4 sentences).
+2. On a new line at the very end, append one action tag per change, in this EXACT format (nothing else on that line):
+[[ACTION:{"type":"add_task","title":"<task name>","time":"HH:MM","duration_min":<number, default 30>,"priority":"low|medium|high|critical"}]]
+[[ACTION:{"type":"complete_task","title":"<task name to match>"}]]
+[[ACTION:{"type":"delete_task","title":"<task name to match>"}]]
+Use 24-hour "HH:MM" format for time, guessed sensibly from context (e.g. "evening" → 18:00) if the user didn't give an exact time. Only emit ACTION tags when the user actually wants a schedule change — never for casual chat. Never mention the tag format itself to the user.`;
+  const systemContext = (state.lang==='en'
+    ? `You are a warm, encouraging productivity and motivation assistant inside a scheduling app called Schedule Lab. The user has completed ${completed} tasks and has a ${state.streak}-day streak. Keep replies short (2-4 sentences), friendly, and practical. Ask a light follow-up question sometimes, like a real assistant would (e.g. about their day, how they're feeling, what's blocking them) — don't just give canned advice.`
+    : `Aap ek warm, motivating productivity assistant ho ek scheduling app "Schedule Lab" ke andar. User ne ${completed} tasks complete kiye hain aur ${state.streak}-din ki streak hai. Replies chhote rakho (2-4 sentences), friendly Hinglish me, practical. Kabhi kabhi ek halka follow-up sawal bhi pucho (jaise unka din kaisa hai, kya feel kar rahe hain, kya rok raha hai) — sirf ready-made advice mat do.`
+  ) + actionRules;
+
+  aiChatHistory.push({ role:'user', content:userText });
+  try{
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-goog-api-key': GEMINI_API_KEY
+      },
+      body: JSON.stringify({
+        contents: aiChatHistory.map(m=>({
+          role: m.role==='model' ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        })),
+        systemInstruction: { parts: [{ text: systemContext }] }
+      })
+    });
+    if(!res.ok){
+      const errBody = await res.text();
+      console.error('Gemini API HTTP error', res.status, errBody);
+      return aiChatReplyFallback(userText);
+    }
+    const data = await res.json();
+    const rawReply = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      || (state.lang==='en' ? "Sorry, I couldn't respond right now. Try again?" : "Sorry, abhi reply nahi kar paya. Dobara try karo?");
+    const { cleanText, notes } = processAiChatActions(rawReply);
+    aiChatHistory.push({ role:'model', content:rawReply });
+    const reply = notes.length ? (cleanText + '\n\n' + notes.join('\n')) : cleanText;
+    return reply;
+  }catch(e){
+    console.error('Gemini API error', e);
+    return aiChatReplyFallback(userText);
+  }
+}
+function aiChatReplyFallback(userText){
+  const txt = userText.toLowerCase();
+  const lang = state.lang;
+  if(/tired|thak/.test(txt)) return lang==='en' ? "Feeling tired is normal — try a short break and some water." : "Thaka hua feel karna normal hai — thoda break lo, paani piyo.";
+  if(/stress|pareshan/.test(txt)) return lang==='en' ? "Take a deep breath. One task at a time." : "Deep breath lo. Ek time me ek hi task.";
+  return lang==='en' ? "I'm here for you! Tell me how you're feeling today." : "Main yahan hoon! Bata do aaj kaisa feel kar rahe ho.";
+}
+
+/* Parses [[ACTION:{...}]] tags out of the AI's raw reply, executes each one
+   against state.tasks, and returns the cleaned display text + human-readable
+   confirmation notes (so the schedule can be changed just by chatting). */
+function processAiChatActions(rawReply){
+  const notes = [];
+  const cleanText = rawReply.replace(/\[\[ACTION:(\{.*?\})\]\]/g, (m, jsonStr)=>{
+    try{
+      const action = JSON.parse(jsonStr);
+      notes.push(executeAiChatAction(action));
+    }catch(e){
+      console.error('Bad AI action JSON', e, jsonStr);
+    }
+    return '';
+  }).trim();
+  return { cleanText, notes: notes.filter(Boolean) };
+}
+
+function executeAiChatAction(action){
+  const en = state.lang==='en';
+  const day = todayISO();
+  if(action.type==='add_task' && action.title && action.time){
+    const startMin = toMinutes(action.time);
+    const dur = Number(action.duration_min) > 0 ? Number(action.duration_min) : 30;
+    const tk = mkTask(action.title, 'general', startMin, startMin+dur, action.priority||'medium');
+    tk.day = day;
+    tk.startISO = fromMinutes(day, tk.startMin);
+    tk.endISO = fromMinutes(day, tk.endMin);
+    state.tasks.push(tk);
+    state.tasks.sort((a,b)=>a.startMin-b.startMin);
+    save(); renderAll();
+    return en ? `✅ Added "${action.title}" at ${action.time}.` : `✅ "${action.title}" ${action.time} pe add ho gaya.`;
+  }
+  if((action.type==='complete_task' || action.type==='delete_task') && action.title){
+    const match = state.tasks.filter(t=>t.day===day)
+      .find(t=>t.title.toLowerCase().includes(String(action.title).toLowerCase()));
+    if(!match) return en ? `⚠️ Couldn't find "${action.title}" in today's schedule.` : `⚠️ "${action.title}" aaj ki list me nahi mila.`;
+    if(action.type==='complete_task'){
+      match.status = 'completed';
+      save(); renderAll();
+      return en ? `✅ Marked "${match.title}" as done.` : `✅ "${match.title}" complete kar diya.`;
+    }else{
+      state.tasks = state.tasks.filter(t=>t.id!==match.id);
+      save(); renderAll();
+      return en ? `🗑️ Removed "${match.title}" from today.` : `🗑️ "${match.title}" hata diya.`;
+    }
+  }
+  return '';
+}
+function appendAiChatBubble(text, fromUser){
+  const container = document.getElementById('aiChatMessages');
+  const bubble = document.createElement('div');
+  bubble.style.cssText = `align-self:${fromUser?'flex-end':'flex-start'};max-width:80%;padding:9px 13px;border-radius:${fromUser?'14px 14px 4px 14px':'4px 14px 14px 14px'};background:${fromUser?'linear-gradient(90deg,var(--neon-blue),var(--neon-purple))':'var(--glass-fill)'};color:${fromUser?'#fff':'var(--text-primary)'};font-size:13.5px;border:${fromUser?'none':'1px solid var(--glass-border)'};`;
+  bubble.textContent = text;
+  container.appendChild(bubble);
+  container.scrollTop = container.scrollHeight;
+}
+/* ---------------- AI FREE-TIME LIMIT (1 hour/day for non-premium) ---------------- */
+const AI_FREE_DAILY_MS = 60 * 60 * 1000; // 1 hour
+
+function getAiFreeTimeState(){
+  const today = new Date().toISOString().slice(0,10);
+  let startedAt = localStorage.getItem('schedule_lab_ai_free_start');
+  let savedDate = localStorage.getItem('schedule_lab_ai_free_date');
+  if(savedDate !== today || !startedAt){
+    // new day (or first-ever use) -> reset the free window
+    startedAt = String(Date.now());
+    localStorage.setItem('schedule_lab_ai_free_start', startedAt);
+    localStorage.setItem('schedule_lab_ai_free_date', today);
+  }
+  const elapsed = Date.now() - parseInt(startedAt, 10);
+  return { elapsed, remaining: AI_FREE_DAILY_MS - elapsed };
+}
+
+function isAiFreeTimeAvailable(){
+  if(isPremium()) return true;
+  return getAiFreeTimeState().remaining > 0;
+}
+
+function aiFreeTimeRemainingText(){
+  const { remaining } = getAiFreeTimeState();
+  if(remaining <= 0) return state.lang==='en' ? '0 min' : '0 मिनट';
+  const mins = Math.ceil(remaining / 60000);
+  return state.lang==='en' ? mins+' min left today' : 'आज '+mins+' मिनट बचे हैं';
+}
+
+async function sendAiChatMessage(){
+  const input = document.getElementById('aiChatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  if(!isAiFreeTimeAvailable()){
+    initAiChatGreeting(true); // re-render with locked state
+    return;
+  }
+  appendAiChatBubble(text, true);
+  input.value = '';
+  appendAiChatBubble('...', false);
+  const container = document.getElementById('aiChatMessages');
+  const typingBubble = container.lastElementChild;
+  const reply = await aiChatReplyReal(text);
+  typingBubble.remove();
+  appendAiChatBubble(reply, false);
+}
+/* MIC / VOICE INPUT for AI Chat — uses the browser's built-in Web Speech API,
+   so it needs no server and works fully offline-of-backend (Chrome/Edge on
+   Android & desktop support it; Safari/iOS support is limited). */
+let voiceRecognizer = null;
+let voiceListening = false;
+function toggleVoiceInput(){
+  const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.getElementById('micBtn');
+  if(!SpeechRecognitionCtor){
+    alert(state.lang==='en' ? "Voice input isn't supported in this browser. Try Chrome." : "Is browser mein voice input support nahi hai. Chrome try karo.");
+    return;
+  }
+  if(voiceListening){
+    voiceRecognizer && voiceRecognizer.stop();
+    return;
+  }
+  voiceRecognizer = new SpeechRecognitionCtor();
+  voiceRecognizer.lang = state.lang==='en' ? 'en-IN' : 'hi-IN';
+  voiceRecognizer.interimResults = false;
+  voiceRecognizer.maxAlternatives = 1;
+  voiceRecognizer.onstart = ()=>{ voiceListening = true; micBtn.style.color = 'var(--danger)'; micBtn.textContent = '🔴'; };
+  voiceRecognizer.onend = ()=>{ voiceListening = false; micBtn.style.color = 'var(--text-primary)'; micBtn.textContent = '🎤'; };
+  voiceRecognizer.onerror = (e)=>{
+    console.error('Speech recognition error', e.error);
+    if(e.error === 'not-allowed' || e.error === 'permission-denied'){
+      alert(state.lang==='en' ? "Microphone permission was blocked. Allow it in your browser settings." : "Microphone permission block hai. Browser settings mein allow karo.");
+    }
+  };
+  voiceRecognizer.onresult = (e)=>{
+    const transcript = e.results[0][0].transcript;
+    const input = document.getElementById('aiChatInput');
+    input.value = transcript;
+    sendAiChatMessage();
+  };
+  voiceRecognizer.start();
+}
+
+function initAiChatGreeting(forceLockedCheck){
+  const container = document.getElementById('aiChatMessages');
+  if(!container) return;
+  if(!isAiFreeTimeAvailable()){
+    container.innerHTML = `<div style="text-align:center;padding:20px;">
+      <div style="font-size:30px;margin-bottom:8px;">⭐</div>
+      <div style="color:var(--text-secondary);font-size:13px;margin-bottom:10px;">${state.lang==='en'?'Your free AI Chat time for today is over. Upgrade to Premium for unlimited AI Chat.':'आज का फ्री AI चैट टाइम खत्म हो गया है। अनलिमिटेड AI चैट के लिए प्रीमियम लो।'}</div>
+      <button class="btn small" onclick="openPremiumModal()">⭐ ${state.lang==='en'?'Unlock Premium':'प्रीमियम अनलॉक करें'}</button>
+    </div>`;
+    document.getElementById('aiChatInput').disabled = true;
+    return;
+  }
+  document.getElementById('aiChatInput').disabled = false;
+  if(!isPremium()){
+    const badge = document.getElementById('aiFreeTimeBadge');
+    if(badge) badge.textContent = aiFreeTimeRemainingText();
+  }
+  if(forceLockedCheck) return;
+  if(container.children.length>0) return;
+  const lang = state.lang;
+  appendAiChatBubble(AI_RESPONSES[lang].greeting[0], false);
+}
+
+/* ---------------- GAMIFICATION: XP, LEVELS, STREAKS, BADGES ---------------- */
+const BADGE_DEFS = [
+  { id:'first_task', minTasks:1, icon:'🌱', en:'First Step', hi:'पहला कदम' },
+  { id:'ten_tasks', minTasks:10, icon:'🔥', en:'Getting Started', hi:'शुरुआत' },
+  { id:'fifty_tasks', minTasks:50, icon:'💪', en:'Consistent', hi:'निरंतर' },
+  { id:'hundred_tasks', minTasks:100, icon:'🏅', en:'Centurion', hi:'शतकवीर' },
+  { id:'streak3', minStreak:3, icon:'🔥', en:'3-Day Streak', hi:'3-दिन स्ट्रीक' },
+  { id:'streak7', minStreak:7, icon:'⚡', en:'Week Warrior', hi:'सप्ताह योद्धा' },
+  { id:'streak30', minStreak:30, icon:'👑', en:'Month Master', hi:'महीने के मास्टर' }
+];
+function getLevel(xp){ return Math.floor(xp/100) + 1; }
+function xpForNextLevel(xp){ const lvl = getLevel(xp); return lvl*100; }
+function xpProgress(xp){ const base=(getLevel(xp)-1)*100; return ((xp-base)/100); }
+
+function awardXP(amount){
+  state.xp += amount;
+  checkBadges();
+}
+function updateStreak(){
+  const today = todayISO();
+  if(state.lastStreakDay === today) return; // already counted today
+  const y = new Date(); y.setDate(y.getDate()-1);
+  const yesterday = todayISO(y);
+  if(state.lastStreakDay === yesterday){
+    state.streak += 1;
+  } else {
+    state.streak = 1;
+  }
+  state.lastStreakDay = today;
+  checkBadges();
+}
+function checkBadges(){
+  const completedCount = state.tasks.filter(t=>t.status==='completed').length;
+  BADGE_DEFS.forEach(b=>{
+    if(state.badges.includes(b.id)) return;
+    if(b.minTasks && completedCount>=b.minTasks){ state.badges.push(b.id); showBadgeToast(b); }
+    if(b.minStreak && state.streak>=b.minStreak){ state.badges.push(b.id); showBadgeToast(b); }
+  });
+}
+function showBadgeToast(badge){
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:300;background:linear-gradient(90deg,var(--gold-dark),var(--gold));color:#241a02;padding:10px 20px;border-radius:20px;font-weight:700;font-size:13px;box-shadow:0 4px 20px rgba(240,193,75,0.4);';
+  el.textContent = `${badge.icon} ${state.lang==='en'?'Badge unlocked:':'बैज मिला:'} ${badge[state.lang]}`;
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity 0.4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }, 3000);
+}
+function renderGamificationUI(){
+  const xpEl = document.getElementById('gamXpBar');
+  const lvlEl = document.getElementById('gamLevel');
+  const streakEl = document.getElementById('gamStreak');
+  const badgesEl = document.getElementById('gamBadges');
+  if(!xpEl) return;
+  const lvl = getLevel(state.xp);
+  const progress = xpProgress(state.xp);
+  lvlEl.textContent = lvl;
+  xpEl.style.width = (progress*100)+'%';
+  streakEl.textContent = state.streak;
+  badgesEl.innerHTML = state.badges.length
+    ? state.badges.map(id=>{ const b=BADGE_DEFS.find(x=>x.id===id); return b ? `<span title="${b[state.lang]}" style="font-size:22px;margin-right:6px;">${b.icon}</span>` : ''; }).join('')
+    : `<span style="color:var(--text-secondary);font-size:12px;">${state.lang==='en'?'Complete tasks to earn badges!':'बैज पाने के लिए टास्क पूरे करो!'}</span>`;
+}
+
+/* ---------------- MANUAL TASK ADD/EDIT/DELETE ---------------- */
+const BREAK_ACTIVITY_ICONS = {
+  instagram:'📱', reels:'🎬', cricket:'🏏', indoor:'🎲',
+  outdoor:'⚽', other_games:'🎮', rest:'🛋️', other:'✨'
+};
+const BREAK_ACTIVITY_KEYS = {
+  instagram:'brkInstagram', reels:'brkReels', cricket:'brkCricket', indoor:'brkIndoor',
+  outdoor:'brkOutdoor', other_games:'brkOtherGames', rest:'brkRest', other:'brkOther'
+};
+function toggleBreakActivityField(){
+  const cat = document.getElementById('taskModalCategory').value;
+  document.getElementById('breakActivityWrap').style.display = (cat==='break') ? 'block' : 'none';
+}
+function openTaskModal(taskId, day){
+  const overlay = document.getElementById('taskModalOverlay');
+  const delBtn = document.getElementById('taskModalDeleteBtn');
+  if(taskId){
+    const tk = findTask(taskId);
+    document.getElementById('taskModalTitle').textContent = t('editTaskTitle');
+    document.getElementById('taskModalId').value = tk.id;
+    document.getElementById('taskModalDay').value = tk.day;
+    document.getElementById('taskModalTitleInput').value = tk.title;
+    document.getElementById('taskModalCategory').value = tk.category || 'other';
+    document.getElementById('taskModalStart').value = fmtTimeInput(tk.startMin);
+    document.getElementById('taskModalEnd').value = fmtTimeInput(tk.endMin);
+    document.getElementById('taskModalPriority').value = tk.priority || 'medium';
+    document.getElementById('taskModalBreakActivity').value = tk.breakActivity || 'instagram';
+    delBtn.style.display = 'block';
+  } else {
+    document.getElementById('taskModalTitle').textContent = t('addTaskTitle');
+    document.getElementById('taskModalId').value = '';
+    document.getElementById('taskModalDay').value = day || todayISO();
+    document.getElementById('taskModalTitleInput').value = '';
+    document.getElementById('taskModalCategory').value = 'other';
+    document.getElementById('taskModalStart').value = '09:00';
+    document.getElementById('taskModalEnd').value = '10:00';
+    document.getElementById('taskModalPriority').value = 'medium';
+    document.getElementById('taskModalBreakActivity').value = 'instagram';
+    delBtn.style.display = 'none';
+  }
+  toggleBreakActivityField();
+  overlay.classList.add('active');
+}
+function closeTaskModal(){
+  document.getElementById('taskModalOverlay').classList.remove('active');
+}
+function fmtTimeInput(min){
+  min=((min%1440)+1440)%1440;
+  return `${String(Math.floor(min/60)).padStart(2,'0')}:${String(min%60).padStart(2,'0')}`;
+}
+function saveTaskModal(){
+  const id = document.getElementById('taskModalId').value;
+  const day = document.getElementById('taskModalDay').value;
+  const title = document.getElementById('taskModalTitleInput').value.trim();
+  const category = document.getElementById('taskModalCategory').value;
+  const startMin = toMinutes(document.getElementById('taskModalStart').value);
+  let endMin = toMinutes(document.getElementById('taskModalEnd').value);
+  const priority = document.getElementById('taskModalPriority').value;
+  const breakActivity = (category==='break') ? document.getElementById('taskModalBreakActivity').value : null;
+  if(!title){ alert('Title daaliye'); return; }
+  if(endMin <= startMin) endMin += 1440;
+
+  if(id){
+    const tk = findTask(id);
+    tk.title = title; tk.category = category; tk.priority = priority;
+    tk.startMin = startMin; tk.endMin = endMin;
+    tk.startISO = fromMinutes(tk.day, startMin); tk.endISO = fromMinutes(tk.day, endMin);
+    tk.aiGenerated = false;
+    tk.breakActivity = breakActivity;
+  } else {
+    const tk = mkTask(title, category, startMin, endMin, priority);
+    tk.day = day; tk.aiGenerated = false;
+    tk.startISO = fromMinutes(day, startMin); tk.endISO = fromMinutes(day, endMin);
+    tk.breakActivity = breakActivity;
+    state.tasks.push(tk);
+  }
+  state.tasks.sort((a,b)=>a.startMin-b.startMin);
+  save();
+  closeTaskModal();
+  renderAll();
+}
+function deleteTaskFromModal(){
+  const id = document.getElementById('taskModalId').value;
+  if(!id) return;
+  if(!confirm('Ye task delete karna hai?')) return;
+  state.tasks = state.tasks.filter(t=>t.id!==id);
+  save();
+  closeTaskModal();
+  renderAll();
+}
+
+/* ---------------- MANUAL TASK ADD/EDIT/DELETE END ---------------- */
+
+/* ---------------- CHAT / TASK REMINDERS ---------------- */
+let alertedTaskIds = new Set();
+let alertedEndTaskIds = new Set();
+let alertsEnabled = (localStorage.getItem('schedule_lab_alerts')==='1');
+let alertChime = null;
+
+function playChime(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type='sine'; o.frequency.value=880;
+    o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.15, ctx.currentTime);
+    o.start(); o.stop(ctx.currentTime+0.35);
+  }catch(e){}
+}
+function playEndChime(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [660, 880].forEach((freq, i)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sine'; o.frequency.value=freq;
+      o.connect(g); g.connect(ctx.destination);
+      const startAt = ctx.currentTime + i*0.18;
+      g.gain.setValueAtTime(0.15, startAt);
+      o.start(startAt); o.stop(startAt+0.3);
+    });
+  }catch(e){}
+}
+
+function enableAlerts(){
+  if(!('Notification' in window)){
+    alert('Ye browser notifications support nahi karta.');
+    return;
+  }
+  Notification.requestPermission().then(perm=>{
+    if(perm==='granted'){
+      alertsEnabled = true;
+      localStorage.setItem('schedule_lab_alerts','1');
+      updateAlertUI();
+      new Notification('Schedule Lab', {body:'Task alerts ON ✅ — is tab ke khule rehte hue aapko time par notify kiya jaayega.', icon:'icon-192.png'});
+    } else {
+      alertsEnabled = false;
+      localStorage.setItem('schedule_lab_alerts','0');
+      updateAlertUI();
+    }
+  });
+}
+function updateAlertUI(){
+  const btn = document.getElementById('alertBtn');
+  const status = document.getElementById('alertStatus');
+  if(!btn) return;
+  if(alertsEnabled){
+    status.textContent = t('alertsOn');
+    btn.textContent = '✓';
+  } else {
+    status.textContent = t('alertsOff');
+    btn.textContent = t('enableBtn');
+  }
+}
+
+/* Checks every 20s whether a task is starting or ending right now; fires a
+   browser notification + in-app sound for both. NOTE: this only works
+   while this tab is open — a website cannot ring the phone's native OS
+   alarm. For a real phone alarm, use your phone's Clock app or ask to
+   have one set directly. */
+/* AI-written one-line motivating message for the task-start notification.
+   Falls back to a plain message if the API is slow/unavailable, so the
+   alert never gets stuck waiting on the network. */
+async function getAiTaskNotifLine(taskTitle){
+  if(GEMINI_API_KEY === 'GEMINI_API_KEY_HERE') return null;
+  try{
+    const controller = new AbortController();
+    const timeoutId = setTimeout(()=>controller.abort(), 3000);
+    const prompt = state.lang==='en'
+      ? `Write one short, warm, motivating sentence (max 14 words) encouraging the user to start their task "${taskTitle}" right now. No quotes, at most 1 emoji.`
+      : `Ek chhota, warm, motivating sentence likho (max 14 words, Hinglish mein) jo user ko abhi "${taskTitle}" task shuru karne ke liye encourage kare. Quotes mat lagao, max 1 emoji.`;
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
+      method:'POST', signal: controller.signal,
+      headers:{ 'Content-Type':'application/json', 'x-goog-api-key': GEMINI_API_KEY },
+      body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] })
+    });
+    clearTimeout(timeoutId);
+    if(!res.ok) return null;
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    return text ? text.trim() : null;
+  }catch(e){ return null; }
+}
+function checkTaskAlerts(){
+  if(!alertsEnabled) return;
+  const now = minutesNow();
+  const todaysActive = state.tasks.filter(tk=>tk.day===todayISO() && (tk.status==='pending' || tk.status==='inProgress'));
+  todaysActive.forEach(tk=>{
+    if(!alertedTaskIds.has(tk.id) && now>=tk.startMin && now < tk.startMin+2){
+      alertedTaskIds.add(tk.id);
+      playChime();
+      if(Notification.permission==='granted'){
+        const fallbackBody = state.lang==='en' ? `It's time to start "${tk.title}" (${fmtTime(tk.startMin)}). Tap to open Schedule Lab.` : `"${tk.title}" ka time ho gaya (${fmtTime(tk.startMin)}). Schedule Lab kholne ke liye tap karo.`;
+        getAiTaskNotifLine(tk.title).then(aiLine=>{
+          const n = new Notification('⏰ ' + tk.title, {
+            body: aiLine || fallbackBody,
+            icon:'icon-192.png', badge:'icon-96.png'
+          });
+          n.onclick = () => { window.focus(); switchTab('today'); n.close(); };
+        });
+      }
+    }
+    if(!alertedEndTaskIds.has(tk.id) && now>=tk.endMin && now < tk.endMin+2){
+      alertedEndTaskIds.add(tk.id);
+      playEndChime();
+      if(Notification.permission==='granted'){
+        const n = new Notification('⏳ ' + tk.title + (state.lang==='en' ? ' — time is up!' : ' — samay khatm ho gaya!'), {
+          body: state.lang==='en' ? `"${tk.title}" was scheduled until ${fmtTime(tk.endMin)}. Tap to open Schedule Lab.` : `"${tk.title}" ka time ${fmtTime(tk.endMin)} tak tha. Schedule Lab kholne ke liye tap karo.`,
+          icon:'icon-192.png', badge:'icon-96.png'
+        });
+        n.onclick = () => { window.focus(); switchTab('today'); n.close(); };
+      }
+    }
+  });
+}
+setInterval(checkTaskAlerts, 20000);
+
+function renderChat(){
+  updateAlertUI();
+  const list = document.getElementById('chatList');
+  list.innerHTML = '';
+  const tasks = state.tasks.filter(t=>t.day===todayISO()).sort((a,b)=>a.startMin-b.startMin);
+  if(tasks.length===0){
+    list.innerHTML = `<div class="empty-state">${t('noRemindersYet')}</div>`;
+    return;
+  }
+  const now = minutesNow();
+  tasks.forEach(tk=>{
+    const isNow = tk.status!=='completed' && tk.status!=='skipped' && now>=tk.startMin && now<tk.endMin;
+    const isPast = now >= tk.endMin;
+    const isDone = tk.status==='completed';
+    let msg;
+    if(isDone) msg = state.lang==='en' ? `✅ "${tk.title}" is complete. Great job!` : `✅ "${tk.title}" complete ho gaya. Badhiya kaam!`;
+    else if(isNow) msg = state.lang==='en' ? `🔔 It's time for "${tk.title}" now (${fmtTime(tk.startMin)}–${fmtTime(tk.endMin)}). Get started!` : `🔔 Abhi "${tk.title}" ka time hai (${fmtTime(tk.startMin)}–${fmtTime(tk.endMin)}). Shuru karo!`;
+    else if(isPast) msg = state.lang==='en' ? `⌛ The scheduled time for "${tk.title}" has passed (${fmtTime(tk.startMin)}).` : `⌛ "${tk.title}" ka scheduled time nikal gaya (${fmtTime(tk.startMin)}).`;
+    else msg = state.lang==='en' ? `⏰ "${tk.title}" starts at ${fmtTime(tk.startMin)}.` : `⏰ "${tk.title}" ${fmtTime(tk.startMin)} par shuru hoga.`;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble' + (isNow ? ' now' : '');
+    bubble.innerHTML = `
+      <div class="chat-avatar">${isNow?'🔔':(isDone?'✅':'🤖')}</div>
+      <div class="chat-content">
+        <div class="chat-name">${t('reminderBotName')} ${isNow?`<span class="now-tag">${t('nowTag')}</span>`:''}</div>
+        <div class="chat-text">${msg}</div>
+        <div class="chat-time">${fmtTime(tk.startMin)}</div>
+      </div>`;
+    list.appendChild(bubble);
+  });
+}
+
+/* ---------------- TABS ---------------- */
+function openAppMenu(){ document.getElementById('appMenuOverlay').classList.add('open'); }
+function closeAppMenu(){ document.getElementById('appMenuOverlay').classList.remove('open'); }
+
+function switchTab(name){
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`nav.bottom button[data-tab="${name}"]`).classList.add('active');
+  if(name==='analytics') renderAnalytics();
+  if(name==='calendar'){ renderDaySelector(); renderTaskList('calendarTaskList', state.selectedDay); }
+  if(name==='goals') renderGoals();
+  if(name==='chat'){ renderChat(); initAiChatGreeting(); }
+}
+
+/* ---------------- BOOTSTRAP ---------------- */
+function showMainApp(){
+  document.getElementById('onboarding').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+  document.getElementById('bottomNav').style.display='flex';
+  document.getElementById('liveClockRow').style.display='flex';
+  updateLiveClock();
+  renderAll();
+  scheduleNativeAlarms();
+}
+function renderAll(){
+  renderTaskList('taskList', todayISO());
+  renderDaySelector();
+  renderTaskList('calendarTaskList', state.selectedDay);
+  renderAnalytics();
+  renderGoals();
+  updateAlertUI();
+}
+
+renderUserTypeChips();
+applyTranslations();
+applyStoredTheme();
+updateNetworkStatus();
+
+/* Hide splash screen after its animation, then let the login/app underneath show */
+setTimeout(()=>{
+  const splash = document.getElementById('splashScreen');
+  if(splash){
+    splash.style.animation = 'splashOut .4s ease forwards';
+    setTimeout(()=>splash.remove(), 450);
+  }
+}, 1800);
+
+if(location.hash === '#privacy'){
+  document.getElementById('privacyView').style.display = 'block';
+  document.getElementById('onboarding').style.display = 'none';
+  document.getElementById('loginGate').style.display = 'none';
+} else if(checkLoginGate()){
+  if(state.profile){
+    showMainApp();
+    handleShortcutParams();
+  } else {
+    document.getElementById('onboarding').style.display='block';
+  }
+}
+syncHeaderProfileIcon();
+
+function handleShortcutParams(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('action') === 'addtask'){
+    setTimeout(()=> openTaskModal(null, todayISO()), 300);
+  } else if(params.get('tab')){
+    setTimeout(()=> switchTab(params.get('tab')), 100);
+  }
+}
+</script>
+
+<script type="text/javascript">
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({pageLanguage:'en', autoDisplay:false}, 'google_translate_element');
+}
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<!-- Razorpay Checkout -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+/* ---------------- PWA: service worker + install prompt ---------------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
+}
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btn = document.getElementById('installAppBtn');
+  if(btn) btn.style.display = 'inline-block';
+});
+function installApp(){
+  if(!deferredInstallPrompt){
+    alert('Is browser me abhi install prompt available nahi hai. Chrome/Edge me browser menu se "Add to Home Screen" try karo, ya Safari (iOS) me Share > Add to Home Screen.');
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(()=>{ deferredInstallPrompt = null; });
+}
+window.addEventListener('appinstalled', ()=>{
+  const btn = document.getElementById('installAppBtn');
+  if(btn) btn.style.display = 'none';
+});
+</script>
+</body>
+</html>
