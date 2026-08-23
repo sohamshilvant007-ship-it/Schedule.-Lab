@@ -237,6 +237,13 @@
     display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;
     position:relative;padding:4px 10px;transition:color .2s ease,transform .15s ease;
   }
+  nav.bottom a{
+    background:none;border:none;color:var(--text-secondary);font-size:11px;
+    display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;
+    position:relative;padding:4px 10px;transition:color .2s ease,transform .15s ease;
+    text-decoration:none;
+  }
+  nav.bottom a:active{transform:scale(0.92);}
   nav.bottom button:active{transform:scale(0.92);}
   nav.bottom button.active{color:var(--neon-blue);}
   nav.bottom button.active::before{
@@ -444,11 +451,10 @@
     </div>
     <div class="app-menu-item" onclick="closeAppMenu();switchTab('today')"><span class="icon">📅</span><span data-t="navToday">Today</span></div>
     <div class="app-menu-item" onclick="closeAppMenu();switchTab('goals')"><span class="icon">🚩</span><span data-t="navGoals">Goals</span></div>
-    <div class="app-menu-item" onclick="closeAppMenu();switchTab('analytics')"><span class="icon">📊</span><span data-t="navAnalytics">Analytics</span></div>
+    <a href="aura.html" target="_blank" class="app-menu-item" onclick="closeAppMenu()" style="text-decoration:none;"><span class="icon">✨</span><span>Aura</span></a>
     <div class="app-menu-item" onclick="closeAppMenu();switchTab('chat')"><span class="icon">💬</span><span data-t="navChat">AI Chat</span></div>
     <div class="app-menu-divider"></div>
     <div class="app-menu-item" onclick="closeAppMenu();showStartWorkingPopup()"><span class="icon">🎯</span><span>Focus Mode</span></div>
-    <div class="app-menu-item" onclick="closeAppMenu();openPremiumModal()"><span class="icon">⭐</span><span>Premium</span></div>
     <div class="app-menu-item" onclick="closeAppMenu();openProfileModal()"><span class="icon">👤</span><span>Profile &amp; Settings</span></div>
     <div class="app-menu-divider"></div>
     <div class="app-menu-item" style="color:var(--danger);" onclick="closeAppMenu();logoutUser()"><span class="icon">🚪</span><span data-t="logoutBtn">Logout (Reset App)</span></div>
@@ -714,10 +720,7 @@
       </div>
 
       <h3 style="margin-top:26px;">✨ Aura AI</h3>
-      <div class="glass" style="padding:16px;text-align:center;">
-        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Apna alag AI assistant, naye tab mein khulega</div>
-        <button class="btn small" style="width:auto;padding:0 20px;" onclick="window.open('aura.html','_blank')">✨ Open Aura</button>
-      </div>
+      <iframe src="https://aura-ai.sheduletimer.workers.dev" scrolling="yes" style="width:100%;height:520px;border:none;border-radius:12px;background:#0a0a18;"></iframe>
     </div>
 
   </div>
@@ -1400,12 +1403,7 @@ function fmtTime(min){
 
 function findTask(id){ return state.tasks.find(t=>t.id===id); }
 function startTask(id){ const tk=findTask(id); tk.status='inProgress'; save(); renderAll(); openFocus(tk); }
-function completeTask(id){
-  const tk=findTask(id);
-  const proofMsg = state.lang==='en' ? `Confirm: did you really complete "${tk.title}"?` : `Confirm karo: kya aapne sach mein "${tk.title}" pura kar liya?`;
-  if(!confirm(proofMsg)) return;
-  tk.status='completed'; awardXP(10); updateStreak(); save(); renderAll();
-}
+function completeTask(id){ const tk=findTask(id); tk.status='completed'; awardXP(10); updateStreak(); save(); renderAll(); }
 function skipTask(id){ const tk=findTask(id); tk.status='skipped'; save(); renderAll(); }
 
 /* ---------------- CALENDAR ---------------- */
@@ -1681,11 +1679,7 @@ function closeFocus(){
   if(phaseLabel) phaseLabel.style.display = 'none';
 }
 function completeFocusTask(){
-  if(focusTask){
-    const proofMsg = state.lang==='en' ? `Confirm: did you really complete "${focusTask.title}"?` : `Confirm karo: kya aapne sach mein "${focusTask.title}" pura kar liya?`;
-    if(!confirm(proofMsg)) return;
-    focusTask.status='completed'; awardXP(10); updateStreak(); save(); renderAll();
-  }
+  if(focusTask){ focusTask.status='completed'; awardXP(10); updateStreak(); save(); renderAll(); }
   closeFocus();
 }
 
@@ -1743,8 +1737,7 @@ const PREMIUM_PLANS = [
   { id:'1y', months:12, price:900, labelEn:'1 Year',   labelHi:'1 साल',    tagEn:'Save ₹300 · Best Value', tagHi:'₹300 बचाएं · बेस्ट वैल्यू' }
 ];
 function isPremium(){
-  const until = parseInt(localStorage.getItem('schedule_lab_premium_until') || '0', 10);
-  return until > Date.now();
+  return true; // Premium/subscription removed — everything is free now
 }
 function openPremiumModal(){
   renderPremiumPlanList();
@@ -1908,39 +1901,7 @@ function checkSleepReminder(){
     }
   }
 }
-
-/* TASK REMINDER — kisi bhi task ka time hone par awaaz mein bolke batata hai */
-let taskAlertedIds = new Set();
-function speakReminder(text){
-  try{
-    if('speechSynthesis' in window){
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = state.lang==='en' ? 'en-IN' : 'hi-IN';
-      utter.rate = 0.95;
-      speechSynthesis.speak(utter);
-    }
-  }catch(e){}
-}
-function checkAllTaskReminder(){
-  if(!alertsEnabled) return;
-  const today = todayISO();
-  const nowMin = minutesNow();
-  state.tasks.filter(tk => tk.day===today && tk.status==='pending')
-    .forEach(tk=>{
-      if(taskAlertedIds.has(tk.id)) return;
-      if(nowMin >= tk.startMin && nowMin < tk.startMin+2){
-        taskAlertedIds.add(tk.id);
-        playAlarmRing();
-        const msg = state.lang==='en' ? `Time for ${tk.title}.` : `${tk.title} ka time ho gaya hai.`;
-        speakReminder(msg);
-        if(Notification.permission==='granted'){
-          const n = new Notification('⏰ ' + tk.title, { body: msg, icon:'icon-192.png' });
-          n.onclick = () => { window.focus(); n.close(); };
-        }
-      }
-    });
-}
-setInterval(()=>{ checkWaterReminder(); checkSleepReminder(); checkAllTaskReminder(); }, 60000);
+setInterval(()=>{ checkWaterReminder(); checkSleepReminder(); }, 60000);
 
 /* ---------------- OFFLINE SCREEN ---------------- */
 function showOfflineScreen(){
@@ -2897,6 +2858,25 @@ function playChime(){
     o.start(); o.stop(ctx.currentTime+0.35);
   }catch(e){}
 }
+function playAlarmRing(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    for(let rep=0; rep<4; rep++){
+      const base = now + rep*1.1;
+      [0, 0.18].forEach(off=>{
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type='square'; o.frequency.value=1000;
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.0001, base+off);
+        g.gain.linearRampToValueAtTime(0.35, base+off+0.02);
+        g.gain.linearRampToValueAtTime(0.0001, base+off+0.15);
+        o.start(base+off); o.stop(base+off+0.16);
+      });
+    }
+    if(navigator.vibrate) navigator.vibrate([300,150,300,150,300,150,300]);
+  }catch(e){}
+}
 function playEndChime(){
   try{
     const ctx = new (window.AudioContext||window.webkitAudioContext)();
@@ -2977,7 +2957,7 @@ function checkTaskAlerts(){
   todaysActive.forEach(tk=>{
     if(!alertedTaskIds.has(tk.id) && now>=tk.startMin && now < tk.startMin+2){
       alertedTaskIds.add(tk.id);
-      playChime();
+      playAlarmRing();
       if(Notification.permission==='granted'){
         const fallbackBody = state.lang==='en' ? `It's time to start "${tk.title}" (${fmtTime(tk.startMin)}). Tap to open Schedule Lab.` : `"${tk.title}" ka time ho gaya (${fmtTime(tk.startMin)}). Schedule Lab kholne ke liye tap karo.`;
         getAiTaskNotifLine(tk.title).then(aiLine=>{
