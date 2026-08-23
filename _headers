@@ -1,0 +1,4 @@
+/aura.html
+  Content-Security-Policy: frame-ancestors 'self'
+/index.html
+  Content-Security-Policy: frame-ancestors 'self'
