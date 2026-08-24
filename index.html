@@ -1465,7 +1465,7 @@ function startTask(id){
 }
 function completeTask(id){
   const tk = findTask(id);
-  if(tk.category === 'break'){ tk.status='completed'; awardXP(10); updateStreak(); save(); renderAll(); return; }
+  (tk.category === 'break'){ tk.status='completed'; awardXP(10); updateStreak(); save(); renderAll(); return; }
   openProofModal(id, 'task');
 }
 function skipTask(id){ const tk=findTask(id); tk.status='skipped'; save(); renderAll(); }
