@@ -1,4 +1,5 @@
-{
+// wrangler.jsonc
+"name": "scheduleapp",{
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "WORKER-NAME",
   "main": "src/index.ts",
